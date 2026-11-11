@@ -36,10 +36,17 @@ def main() -> int:
             print()
         return 0
 
-    # Se importa aquí para que --prompt funcione sin clave.
+    # Se importan aquí para que --prompt funcione sin clave.
+    import openai
+
+    from cotizador.errores import explicar_error_openai
     from cotizador.llm import construir_interprete
 
-    pedido = construir_interprete().invoke({"texto_usuario": args.texto})
+    try:
+        pedido = construir_interprete().invoke({"texto_usuario": args.texto})
+    except openai.APIError as error:
+        print(f"No se pudo consultar el modelo: {explicar_error_openai(error)}")
+        return 1
     print(pedido.model_dump_json(indent=2))
     return 0
 
