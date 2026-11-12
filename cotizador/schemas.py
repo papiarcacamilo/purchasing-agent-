@@ -1,15 +1,18 @@
 """Modelos Pydantic: salida estructurada del LLM y estado compartido del grafo.
 
-Hay dos familias de modelos y conviene no confundirlas:
+Hay tres familias de modelos y conviene no confundirlas:
 
 - Pedido / ItemPedido: lo que DEBE devolver el LLM al interpretar la solicitud.
   Todos sus campos son obligatorios (los que pueden faltar aceptan None) y no
   admiten campos extra: así el esquema es compatible con Structured Outputs
   en modo estricto.
+- Oferta: un precio publicado por un proveedor. No la escribe el LLM: sale de
+  los catálogos, por eso sí admite valores por defecto.
 - EstadoCompra: la memoria compartida del grafo. Cada nodo la recibe y devuelve
   un diccionario con SOLO los campos que actualiza.
 """
 import operator
+from datetime import date
 from typing import Annotated, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -60,6 +63,32 @@ class Pedido(BaseModel):
     proveedores: list[str] = Field(
         description="Proveedores que el usuario pidió consultar. Lista vacía si no nombró ninguno."
     )
+
+
+class Oferta(BaseModel):
+    """Un producto publicado por un proveedor, con el origen del dato.
+
+    Conserva todo lo que exige el enunciado: nombre, presentación, precio,
+    moneda, proveedor, fuente, fecha de consulta y disponibilidad.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    proveedor: str = Field(min_length=1)
+    nombre: str = Field(min_length=1)
+    marca: Optional[str] = None
+    presentacion: str = Field(min_length=1, description="Empaque tal como lo publica la tienda.")
+    contenido: Optional[float] = Field(default=None, gt=0, description="Cantidad que trae el empaque.")
+    unidad_contenido: Optional[Unidad] = None
+    precio: float = Field(gt=0)
+    moneda: str = "COP"
+    ciudad: Optional[str] = None
+    disponible: Optional[bool] = Field(default=None, description="None significa no verificado.")
+    url: str = Field(min_length=1, description="Página de donde se tomó el precio.")
+    id_fuente: Optional[str] = Field(default=None, description="Código del producto en la tienda.")
+    fecha_consulta: date
+    origen: Literal["catalogo_referencia", "web"] = "catalogo_referencia"
+    nota: Optional[str] = Field(default=None, description="Condición comercial, por ejemplo una oferta.")
 
 
 class EstadoCompra(BaseModel):
