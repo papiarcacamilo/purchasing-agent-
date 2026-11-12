@@ -74,3 +74,56 @@ def crear_prompt_interprete() -> ChatPromptTemplate:
     return ChatPromptTemplate.from_messages(
         [("system", PROMPT_SISTEMA), ("human", PROMPT_USUARIO)]
     )
+
+
+# --------------------------------------------------------------------------
+# Prompt del agente buscador (actividad 2.3)
+# --------------------------------------------------------------------------
+
+PROMPT_BUSCADOR = """\
+Eres un agente de compras. Tu única tarea es BUSCAR precios usando las herramientas \
+disponibles. No calculas totales, no recomiendas y no redactas el presupuesto: eso lo \
+hacen otras etapas.
+
+Reglas:
+
+1. Para CADA producto de la lista, llama a la herramienta de CADA proveedor indicado. \
+Puedes pedir varias herramientas en el mismo turno; hazlo, es más rápido.
+2. El argumento "termino" es el nombre genérico del producto, sin cantidades ni unidades: \
+"arroz", "aceite de girasol", "papel higiénico". Incluye la marca solo si el usuario la \
+exige: "arroz diana".
+3. Si una búsqueda no devuelve resultados, vuelve a intentarlo UNA sola vez con un término \
+más general (quita la marca, o deja la palabra principal). Si sigue sin resultados, \
+déjalo así: que un producto no esté en una tienda es un resultado válido.
+4. Usa únicamente lo que devuelven las herramientas. No inventes productos, precios ni \
+tiendas, y no uses precios que creas recordar.
+5. Cuando hayas buscado todos los productos en todos los proveedores, responde con un \
+resumen de una línea y NO pidas más herramientas. Ese resumen cierra tu trabajo.
+"""
+
+
+def encargo_de_busqueda(pedido, nombres_herramientas: list[str]) -> str:
+    """Mensaje inicial para el agente: qué buscar y con qué herramientas.
+
+    Lo construye el código (no el LLM) para que la lista de productos y de proveedores
+    sea siempre exacta.
+    """
+    lineas = ["Productos que debes buscar:"]
+    for numero, item in enumerate(pedido.items, start=1):
+        detalles = []
+        if item.marca:
+            detalles.append(f"marca exigida: {item.marca}")
+        if item.presentacion:
+            detalles.append(f"presentación: {item.presentacion}")
+        if item.observaciones:
+            detalles.append(item.observaciones)
+        extra = f" ({'; '.join(detalles)})" if detalles else ""
+        lineas.append(f"{numero}. {item.producto}{extra}")
+
+    lineas.append("")
+    lineas.append("Herramientas que debes usar, una por proveedor:")
+    lineas.extend(f"- {nombre}" for nombre in nombres_herramientas)
+    if pedido.ciudad:
+        lineas.append("")
+        lineas.append(f"Ciudad de la compra: {pedido.ciudad}.")
+    return "\n".join(lineas)

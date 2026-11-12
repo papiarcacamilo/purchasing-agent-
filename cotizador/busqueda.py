@@ -32,6 +32,17 @@ def palabras_clave(texto: str) -> list[str]:
     return [_singular(p) for p in palabras if p not in VACIAS]
 
 
+def _texto_buscable(oferta: Oferta) -> list[str]:
+    return palabras_clave(f"{oferta.nombre} {oferta.marca or ''}")
+
+
+def coincide(oferta: Oferta, producto: str, marca: str | None = None) -> bool:
+    """La oferta menciona todas las palabras del producto (y de la marca, si se exige)."""
+    texto = _texto_buscable(oferta)
+    exigidas = palabras_clave(producto) + (palabras_clave(marca) if marca else [])
+    return bool(exigidas) and all(palabra in texto for palabra in exigidas)
+
+
 def buscar_ofertas(ofertas: list[Oferta], termino: str, limite: int = 8) -> list[Oferta]:
     """Ofertas cuyo nombre o marca contienen TODAS las palabras del término.
 
@@ -44,8 +55,8 @@ def buscar_ofertas(ofertas: list[Oferta], termino: str, limite: int = 8) -> list
 
     encontradas = []
     for oferta in ofertas:
-        del_nombre = palabras_clave(f"{oferta.nombre} {oferta.marca or ''}")
-        if all(palabra in del_nombre for palabra in buscadas):
+        if coincide(oferta, termino):
+            del_nombre = _texto_buscable(oferta)
             posicion = min(del_nombre.index(palabra) for palabra in buscadas)
             encontradas.append((posicion, oferta.precio, oferta))
 

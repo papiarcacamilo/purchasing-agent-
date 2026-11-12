@@ -1,6 +1,7 @@
 """Pruebas del traductor de errores de OpenAI (sin red)."""
 import httpx
 import openai
+from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 
 import main as cli
@@ -30,8 +31,12 @@ def test_main_muestra_una_linea_clara_y_no_una_traza(monkeypatch, capsys):
         raise _error_http(openai.AuthenticationError, 401)
 
     # Se sustituye el intérprete real por uno que falla como una clave rechazada.
+    # El buscador también se inyecta: así nada del grafo pide la clave.
     grafo_real = cli.construir_grafo
-    monkeypatch.setattr(cli, "construir_grafo", lambda: grafo_real(interprete=RunnableLambda(falla)))
+    sin_busqueda = RunnableLambda(lambda _: AIMessage(content="no busco nada"))
+    monkeypatch.setattr(
+        cli, "construir_grafo", lambda: grafo_real(interprete=RunnableLambda(falla), buscador=sin_busqueda)
+    )
     monkeypatch.setattr("sys.argv", ["main.py", "--texto", "5 kg de arroz"])
 
     assert cli.main() == 1

@@ -1,9 +1,29 @@
 """Pruebas del nodo de interpretación y del grafo con un LLM falso (sin API ni .env)."""
+from datetime import date
+
+from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 
 from cotizador.grafo import construir_grafo
 from cotizador.nodos import crear_nodo_interpretar
-from cotizador.schemas import EstadoCompra, ItemPedido, Pedido
+from cotizador.schemas import EstadoCompra, ItemPedido, Oferta, Pedido
+
+# Catálogo mínimo: estas pruebas miran el nodo de interpretación, no la búsqueda.
+CATALOGO = {
+    "Tienda Ficticia": [
+        Oferta(
+            proveedor="Tienda Ficticia", nombre="Arroz de prueba (1000 gr)", presentacion="1000 gr",
+            contenido=1000, unidad_contenido="g", precio=5000, url="https://example.com/a",
+            fecha_consulta=date(2026, 11, 11),
+        )
+    ]
+}
+SIN_BUSQUEDA = RunnableLambda(lambda _: AIMessage(content="no busco nada"))
+
+
+def _construir(interprete):
+    """Arma el grafo con el intérprete indicado y el resto de piezas falsas."""
+    return construir_grafo(interprete=interprete, buscador=SIN_BUSQUEDA, catalogos=CATALOGO)
 
 PEDIDO_FALSO = Pedido(
     items=[
@@ -71,18 +91,17 @@ def test_sin_texto_no_se_llama_al_modelo():
 
 
 def test_el_grafo_ejecuta_el_nodo_y_deja_el_pedido_en_el_estado():
-    grafo = construir_grafo(interprete=_interprete_falso([]))
+    grafo = _construir(_interprete_falso([]))
     final = EstadoCompra.model_validate(
         grafo.invoke(EstadoCompra(texto_usuario="5 kg de arroz y 2 litros de aceite"))
     )
     assert [i.producto for i in final.pedido.items] == ["arroz", "aceite"]
     assert final.pedido.ciudad == "Medellín"
-    assert len(final.historial) == 1
+    assert final.historial[0].startswith("[interpretar_pedido]")
 
 
-def test_el_diagrama_del_grafo_incluye_el_nodo():
-    grafo = construir_grafo(interprete=_interprete_falso([]))
-    mermaid = grafo.get_graph().draw_mermaid()
-    assert "interpretar_pedido" in mermaid
+def test_el_diagrama_del_grafo_empieza_por_la_interpretacion():
+    mermaid = _construir(_interprete_falso([])).get_graph().draw_mermaid()
     assert "__start__ --> interpretar_pedido" in mermaid
-    assert "interpretar_pedido --> __end__" in mermaid
+    assert "interpretar_pedido --> preparar_busqueda" in mermaid
+    assert "recolectar_ofertas --> __end__" in mermaid

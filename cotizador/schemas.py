@@ -15,6 +15,8 @@ import operator
 from datetime import date
 from typing import Annotated, Literal, Optional
 
+from langchain_core.messages import AnyMessage
+from langgraph.graph.message import add_messages
 from pydantic import BaseModel, ConfigDict, Field
 
 # Unidades que el sistema sabe convertir. "lb" es la libra de uso comercial.
@@ -91,6 +93,15 @@ class Oferta(BaseModel):
     nota: Optional[str] = Field(default=None, description="Condición comercial, por ejemplo una oferta.")
 
 
+class ResultadoBusqueda(BaseModel):
+    """Las ofertas encontradas para UN ítem del pedido, en todos los proveedores."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    item: ItemPedido
+    ofertas: list[Oferta] = Field(default_factory=list)
+
+
 class EstadoCompra(BaseModel):
     """Estado que viaja por el grafo.
 
@@ -104,3 +115,9 @@ class EstadoCompra(BaseModel):
     datos_faltantes: list[str] = Field(default_factory=list)
     suposiciones: Annotated[list[str], operator.add] = Field(default_factory=list)
     historial: Annotated[list[str], operator.add] = Field(default_factory=list)
+
+    # Conversación del agente buscador con sus herramientas. El reducer add_messages
+    # agrega los mensajes nuevos y respeta los identificadores de cada llamada.
+    mensajes: Annotated[list[AnyMessage], add_messages] = Field(default_factory=list)
+    resultados: list[ResultadoBusqueda] = Field(default_factory=list)
+    proveedores_consultados: list[str] = Field(default_factory=list)

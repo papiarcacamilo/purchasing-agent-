@@ -27,10 +27,11 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.mermaid:
-        # Intérprete de relleno: solo para dibujar, no se llama al LLM ni se exige la clave.
+        # Piezas de relleno: solo para dibujar, no se llama al LLM ni se exige la clave.
         from langchain_core.runnables import RunnableLambda
 
-        grafo = construir_grafo(interprete=RunnableLambda(lambda _: None))
+        relleno = RunnableLambda(lambda _: None)
+        grafo = construir_grafo(interprete=relleno, buscador=relleno)
         print(grafo.get_graph().draw_mermaid())
         return 0
 
@@ -50,6 +51,16 @@ def main() -> int:
 
     print("\n================ PEDIDO INTERPRETADO ================")
     print(estado.pedido.model_dump_json(indent=2) if estado.pedido else "Sin pedido.")
+
+    print("\n================ OFERTAS ENCONTRADAS ================")
+    print(f"Proveedores consultados: {', '.join(estado.proveedores_consultados) or 'ninguno'}")
+    for resultado in estado.resultados:
+        print(f"\n--- {resultado.item.producto} ({len(resultado.ofertas)} ofertas) ---")
+        for oferta in resultado.ofertas:
+            precio = f"$ {oferta.precio:,.0f}".replace(",", ".")
+            print(f"  [{oferta.proveedor}] {oferta.nombre} | {precio} | {oferta.url}")
+        if not resultado.ofertas:
+            print("  Sin cotización en los proveedores consultados.")
     print("\n--- Traza de nodos ---")
     for linea in estado.historial:
         print(linea)
