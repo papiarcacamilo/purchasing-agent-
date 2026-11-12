@@ -108,6 +108,18 @@ def test_el_encargo_inicial_lista_productos_restricciones_y_herramientas():
     assert "buscar_en_exito" in humano.content and "Medellín" in humano.content
 
 
+def test_si_el_usuario_nombra_tiendas_solo_se_ofrecen_esas_herramientas():
+    modelo, recibido = _modelo_con_guion(AIMessage(content="listo"))
+    nodo = crear_nodo_agente_buscador(modelo, HERRAMIENTAS)
+    estado = EstadoCompra(pedido=_pedido(_item("arroz")), proveedores_consultados=["Éxito"])
+
+    nodo(estado)
+
+    humano = recibido[0][1].content
+    assert "buscar_en_exito" in humano
+    assert "buscar_en_carulla" not in humano
+
+
 def test_el_agente_continua_la_conversacion_y_registra_lo_que_pide():
     llamada = AIMessage(content="", tool_calls=[_llamada("buscar_en_exito", "arroz", 1)])
     modelo, recibido = _modelo_con_guion(llamada)
@@ -166,6 +178,22 @@ def test_el_ciclo_completo_busca_recolecta_y_agrupa_por_item():
     # Ninguna oferta de azúcar se coló en el arroz.
     assert all("Arroz" in o.nombre for o in arroz.ofertas)
     assert any(isinstance(m, ToolMessage) for m in final.mensajes)
+
+
+def test_se_descartan_las_ofertas_de_una_tienda_que_el_usuario_no_pidio():
+    _grafo.pedido = _pedido(_item("arroz"), proveedores=["Éxito"])
+    grafo, _ = _grafo(
+        # El modelo se salta la instrucción y consulta también Carulla.
+        AIMessage(content="", tool_calls=[
+            _llamada("buscar_en_exito", "arroz", 1), _llamada("buscar_en_carulla", "arroz", 2),
+        ]),
+        AIMessage(content="listo"),
+    )
+    final = EstadoCompra.model_validate(grafo.invoke(EstadoCompra(texto_usuario="arroz en Exito")))
+
+    assert final.proveedores_consultados == ["Éxito"]
+    assert {o.proveedor for o in final.resultados[0].ofertas} == {"Éxito"}
+    assert any("descartadas por ser de tiendas no pedidas" in l for l in final.historial)
 
 
 def test_la_marca_exigida_filtra_las_ofertas_del_item():

@@ -89,6 +89,8 @@ Reglas:
 
 1. Para CADA producto de la lista, llama a la herramienta de CADA proveedor indicado. \
 Puedes pedir varias herramientas en el mismo turno; hazlo, es más rápido.
+1b. Usa ÚNICAMENTE las herramientas que aparecen en la lista del encargo. Si una \
+herramienta no está en esa lista, el usuario no quiere esa tienda: no la consultes.
 2. El argumento "termino" es el nombre genérico del producto, sin cantidades ni unidades: \
 "arroz", "aceite de girasol", "papel higiénico". Incluye la marca solo si el usuario la \
 exige: "arroz diana".

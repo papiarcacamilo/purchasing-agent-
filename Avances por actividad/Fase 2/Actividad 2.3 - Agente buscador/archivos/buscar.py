@@ -45,10 +45,14 @@ def proveedores_a_consultar(pedido, disponibles: list[str]) -> tuple[list[str], 
 
 def crear_nodo_agente_buscador(modelo: Runnable, herramientas: list[BaseTool]):
     """Fábrica: recibe el LLM con herramientas enlazadas y la lista de herramientas."""
-    nombres = [h.name for h in herramientas]
+    todas = [h.name for h in herramientas]
 
     def agente_buscador(state: EstadoCompra) -> dict:
         if not state.mensajes:
+            # Solo se le ofrecen las herramientas de los proveedores elegidos:
+            # si el usuario nombró tiendas, no se consultan otras.
+            permitidas = [nombre_herramienta(p) for p in state.proveedores_consultados]
+            nombres = [n for n in todas if n in permitidas] or todas
             # Primera vuelta: el encargo lo arma el código, no el modelo.
             encargo = encargo_de_busqueda(state.pedido, nombres)
             conversacion = [SystemMessage(PROMPT_BUSCADOR), HumanMessage(encargo)]
@@ -89,7 +93,8 @@ def crear_nodo_recolectar(catalogos: dict[str, list[Oferta]]):
             if isinstance(mensaje, ToolMessage) and isinstance(mensaje.artifact, list):
                 for oferta in mensaje.artifact:
                     encontradas.setdefault((oferta.proveedor, oferta.nombre, oferta.presentacion), oferta)
-        del_agente = list(encontradas.values())
+        # Si el agente consultó una tienda que el usuario no pidió, se descarta.
+        del_agente = [o for o in encontradas.values() if o.proveedor in consultados]
 
         # 2 y 3. Un resultado por ítem; si queda vacío, búsqueda de respaldo.
         resultados, con_respaldo, sin_cotizacion = [], [], []
@@ -102,9 +107,12 @@ def crear_nodo_recolectar(catalogos: dict[str, list[Oferta]]):
                 (con_respaldo if suyas else sin_cotizacion).append(item.producto)
             resultados.append(ResultadoBusqueda(item=item, ofertas=suyas))
 
+        descartadas = len(encontradas) - len(del_agente)
         historial = [
             f"[recolectar_ofertas] {len(del_agente)} ofertas del agente en "
-            f"{len({o.proveedor for o in del_agente})} proveedores; "
+            f"{len({o.proveedor for o in del_agente})} proveedores"
+            + (f" ({descartadas} descartadas por ser de tiendas no pedidas)" if descartadas else "")
+            + "; "
             f"{sum(len(r.ofertas) for r in resultados)} asignadas a {len(resultados)} ítems"
         ]
         if con_respaldo:
