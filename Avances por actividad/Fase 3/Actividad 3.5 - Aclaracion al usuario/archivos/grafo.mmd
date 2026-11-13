@@ -1,0 +1,36 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	interpretar_pedido(interpretar_pedido)
+	validar_pedido(validar_pedido)
+	pedir_aclaracion(pedir_aclaracion)
+	preparar_busqueda(preparar_busqueda)
+	agente_buscador(agente_buscador)
+	herramientas(herramientas<hr/><small><em>__tools = buscar_en_ara, buscar_en_carulla, buscar_en_exito</em></small>)
+	recolectar_ofertas(recolectar_ofertas)
+	normalizar_ofertas(normalizar_ofertas)
+	clasificar_equivalencia(clasificar_equivalencia)
+	calcular_presupuesto(calcular_presupuesto)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> interpretar_pedido;
+	agente_buscador -.-> herramientas;
+	agente_buscador -.-> recolectar_ofertas;
+	clasificar_equivalencia --> calcular_presupuesto;
+	herramientas --> agente_buscador;
+	interpretar_pedido --> validar_pedido;
+	normalizar_ofertas --> clasificar_equivalencia;
+	pedir_aclaracion -.-> interpretar_pedido;
+	pedir_aclaracion -.-> validar_pedido;
+	preparar_busqueda --> agente_buscador;
+	recolectar_ofertas --> normalizar_ofertas;
+	validar_pedido -.-> pedir_aclaracion;
+	validar_pedido -.-> preparar_busqueda;
+	calcular_presupuesto --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
+

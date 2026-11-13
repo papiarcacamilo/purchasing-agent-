@@ -1,14 +1,15 @@
 """Construcción y compilación del grafo LangGraph.
 
-Flujo actual (fases 1 y 2):
+Flujo completo:
 
-    START -> interpretar_pedido -> preparar_busqueda -> agente_buscador
+    START -> interpretar_pedido -> validar_pedido
+             validar_pedido  <-> pedir_aclaracion    (ciclo de aclaración)
+             validar_pedido   -> preparar_busqueda -> agente_buscador
              agente_buscador <-> herramientas        (ciclo del agente)
              agente_buscador  -> recolectar_ofertas -> normalizar_ofertas
                               -> clasificar_equivalencia -> calcular_presupuesto -> END
 
-En las siguientes fases se agregan la validación con `interrupt()`, la
-normalización, el presupuesto y el informe.
+Hay dos ciclos y los dos tienen tope: MAX_ACLARACIONES y MAX_VUELTAS.
 """
 from typing import Optional
 
@@ -18,6 +19,8 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.prebuilt import ToolNode
 
 from cotizador.herramientas import crear_herramientas
+from langgraph.checkpoint.base import BaseCheckpointSaver
+
 from cotizador.nodos import (
     calcular_presupuesto,
     crear_nodo_agente_buscador,
@@ -26,8 +29,10 @@ from cotizador.nodos import (
     crear_nodo_preparar_busqueda,
     crear_nodo_recolectar,
     normalizar_ofertas,
+    pedir_aclaracion,
+    validar_pedido,
 )
-from cotizador.routers import enrutar_busqueda
+from cotizador.routers import enrutar_aclaracion, enrutar_busqueda, enrutar_validacion
 from cotizador.schemas import EstadoCompra, Oferta
 
 
@@ -37,6 +42,7 @@ def construir_grafo(
     clasificador: Optional[Runnable] = None,
     catalogos: Optional[dict[str, list[Oferta]]] = None,
     herramientas: Optional[list[BaseTool]] = None,
+    checkpointer: Optional[BaseCheckpointSaver] = None,
 ):
     """Arma y compila el grafo.
 
@@ -61,6 +67,8 @@ def construir_grafo(
 
     # --- Nodos ---
     g.add_node("interpretar_pedido", crear_nodo_interpretar(interprete))
+    g.add_node("validar_pedido", validar_pedido)
+    g.add_node("pedir_aclaracion", pedir_aclaracion)
     g.add_node("preparar_busqueda", crear_nodo_preparar_busqueda(catalogos))
     g.add_node("agente_buscador", crear_nodo_agente_buscador(buscador, herramientas))
     # ToolNode ejecuta las llamadas que pidió el agente. messages_key: nuestro
@@ -73,7 +81,16 @@ def construir_grafo(
 
     # --- Aristas ---
     g.add_edge(START, "interpretar_pedido")
-    g.add_edge("interpretar_pedido", "preparar_busqueda")
+    g.add_edge("interpretar_pedido", "validar_pedido")
+    g.add_conditional_edges(
+        "validar_pedido", enrutar_validacion, ["pedir_aclaracion", "preparar_busqueda"]
+    )
+    # Tras la respuesta se reinterpreta la solicitud completa: el pedido nuevo
+    # reemplaza al anterior y vuelve a validarse. Si no hubo respuesta se pasa
+    # directo a validar, sin gastar una llamada al modelo.
+    g.add_conditional_edges(
+        "pedir_aclaracion", enrutar_aclaracion, ["interpretar_pedido", "validar_pedido"]
+    )
     g.add_edge("preparar_busqueda", "agente_buscador")
 
     # Enrutamiento: el agente pide herramientas o da por terminada la búsqueda.
@@ -86,4 +103,6 @@ def construir_grafo(
     g.add_edge("clasificar_equivalencia", "calcular_presupuesto")
     g.add_edge("calcular_presupuesto", END)
 
-    return g.compile()
+    # Sin checkpointer el grafo funciona, pero si se detiene a preguntar no
+    # puede reanudarse: no hay dónde guardar el estado de la pausa.
+    return g.compile(checkpointer=checkpointer)

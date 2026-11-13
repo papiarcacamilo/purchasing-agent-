@@ -1,4 +1,5 @@
 """Pruebas del nodo de interpretación y del grafo con un LLM falso (sin API ni .env)."""
+import sys
 from datetime import date
 
 from langchain_core.messages import AIMessage
@@ -108,8 +109,30 @@ def test_el_grafo_ejecuta_el_nodo_y_deja_el_pedido_en_el_estado():
 def test_el_diagrama_del_grafo_empieza_por_la_interpretacion():
     mermaid = _construir(_interprete_falso([])).get_graph().draw_mermaid()
     assert "__start__ --> interpretar_pedido" in mermaid
-    assert "interpretar_pedido --> preparar_busqueda" in mermaid
+    assert "interpretar_pedido --> validar_pedido" in mermaid
+    assert "validar_pedido -." in mermaid, "la validación decide: arista punteada"
+    assert "pedir_aclaracion -." in mermaid, "tras preguntar también se decide"
     assert "recolectar_ofertas --> normalizar_ofertas" in mermaid
     assert "normalizar_ofertas --> clasificar_equivalencia" in mermaid
     assert "clasificar_equivalencia --> calcular_presupuesto" in mermaid
     assert "calcular_presupuesto --> __end__" in mermaid
+
+
+def test_mermaid_funciona_sin_clave(monkeypatch, capsys):
+    """`main.py --mermaid` debe dibujar el grafo sin exigir OPENAI_API_KEY.
+
+    Es la única forma de ver el grafo sin tener clave, así que si el grafo crece
+    con una dependencia nueva y `main.py` no la rellena, esta prueba falla.
+    """
+    import main
+
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr("cotizador.config.cargar_config", _no_debe_pedir_clave)
+    monkeypatch.setattr(sys, "argv", ["main.py", "--mermaid"])
+
+    assert main.main() == 0
+    assert "interpretar_pedido" in capsys.readouterr().out
+
+
+def _no_debe_pedir_clave():
+    raise AssertionError("--mermaid no debe exigir la clave de OpenAI")

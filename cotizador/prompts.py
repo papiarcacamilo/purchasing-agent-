@@ -54,6 +54,13 @@ Los comercios que el usuario pide consultar, con su nombre propio (por ejemplo \
 "Éxito", "Carulla"). Si solo dice "dos supermercados" sin nombrarlos, deja la \
 lista vacía.
 
+## 4. Aclaraciones posteriores
+La solicitud puede terminar con un bloque "--- Aclaración posterior ---" que \
+contiene una pregunta y la respuesta del usuario. Ese bloque NUNCA agrega un \
+producto nuevo: responde un dato que faltaba de un producto YA mencionado \
+arriba. Úsalo para completar ese ítem y devuelve la misma lista de productos de \
+la solicitud original, ni uno más.
+
 ## Ejemplos de referencia
 Solicitud: Necesito 5 kg de arroz, 2 litros de aceite y 3 kg de azúcar. Consulta \
 dos supermercados y prepara un presupuesto para Medellín.
@@ -73,6 +80,21 @@ observaciones integral, sin presentación. Ciudad: null. Proveedores: lista vac�
 Solicitud: media libra de café Sello Rojo en bolsa y 500 gramos de sal
 Resultado: café 0.5 lb, marca Sello Rojo, presentación bolsa; sal 500 g. Ciudad: \
 null. Proveedores: lista vacía.
+
+Solicitud: necesito arroz y 2 litros de aceite
+--- Aclaración posterior ---
+Pregunta: cuánto arroz se necesita
+Respuesta del usuario: 2kg
+Resultado: DOS ítems, no tres. La respuesta completó la cantidad del arroz que \
+ya estaba en la lista: arroz 2 kg; aceite 2 L. Ciudad: null. Proveedores: lista \
+vacía.
+
+Solicitud: quiero 3 panes
+--- Aclaración posterior ---
+Pregunta: cuánto panela se necesita
+Respuesta del usuario: no sé, deja así
+Resultado: UN ítem: pan 3 unidad. La respuesta no aporta ningún dato y no crea \
+ningún producto.
 """
 
 PROMPT_USUARIO = 'Solicitud del usuario:\n"""\n{texto_usuario}\n"""'

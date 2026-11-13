@@ -10,9 +10,9 @@ import sys
 
 import openai
 
+from cotizador.ejecutar import ejecutar
 from cotizador.errores import explicar_error_openai
 from cotizador.grafo import construir_grafo
-from cotizador.schemas import EstadoCompra
 
 
 def main() -> int:
@@ -31,7 +31,10 @@ def main() -> int:
         from langchain_core.runnables import RunnableLambda
 
         relleno = RunnableLambda(lambda _: None)
-        grafo = construir_grafo(interprete=relleno, buscador=relleno)
+        # Se rellenan TODAS las dependencias que usan el modelo. Si el grafo
+        # crece con otra, hay que agregarla aquí: la prueba
+        # `test_mermaid_funciona_sin_clave` avisa si se olvida.
+        grafo = construir_grafo(interprete=relleno, buscador=relleno, clasificador=relleno)
         print(grafo.get_graph().draw_mermaid())
         return 0
 
@@ -40,14 +43,14 @@ def main() -> int:
         print("No se recibió ninguna solicitud.")
         return 1
 
-    grafo = construir_grafo()
     try:
-        resultado = grafo.invoke(EstadoCompra(texto_usuario=texto))
+        # `ejecutar` atiende las pausas: si falta un dato, pregunta por consola
+        # y reanuda el grafo donde se quedó.
+        estado = ejecutar(texto)
     except openai.APIError as error:
         # Mensaje claro en lugar de una traza larga; nunca se imprime la clave.
         print(f"No se pudo consultar el modelo: {explicar_error_openai(error)}")
         return 1
-    estado = EstadoCompra.model_validate(resultado)
 
     print("\n================ PEDIDO INTERPRETADO ================")
     print(estado.pedido.model_dump_json(indent=2) if estado.pedido else "Sin pedido.")
@@ -102,6 +105,11 @@ def main() -> int:
         mostrar(presupuesto)
     if estado.combinado:
         mostrar(estado.combinado)
+
+    if estado.suposiciones:
+        print("\n========= SUPUESTOS Y CONDICIONES NO VERIFICADAS =========")
+        for suposicion in estado.suposiciones:
+            print(f"  - {suposicion}")
 
     print("\n--- Traza de nodos ---")
     for linea in estado.historial:

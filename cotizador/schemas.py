@@ -205,6 +205,12 @@ class EstadoCompra(BaseModel):
     texto_usuario: str = ""
     pedido: Optional[Pedido] = None
     datos_faltantes: list[str] = Field(default_factory=list)
+    # Veces que el grafo ya se detuvo a preguntar. Es el tope del ciclo de
+    # aclaración, igual que MAX_VUELTAS lo es del ciclo del agente buscador.
+    aclaraciones: int = 0
+    # ¿La última pausa trajo texto nuevo? Si no, no vale la pena volver a
+    # llamar al modelo para reinterpretar lo mismo.
+    hubo_respuesta: bool = False
     suposiciones: Annotated[list[str], operator.add] = Field(default_factory=list)
     historial: Annotated[list[str], operator.add] = Field(default_factory=list)
 
