@@ -1,4 +1,5 @@
 """Pruebas del prompt y de la cadena de interpretación (sin red y sin clave)."""
+import secrets
 from typing import get_args
 
 from langchain_core.runnables import RunnableLambda
@@ -39,7 +40,7 @@ def test_el_prompt_declara_el_texto_como_datos():
 
 def test_la_cadena_se_construye_con_salida_estructurada_estricta():
     # Clave falsa: construir la cadena no hace llamadas de red.
-    llm = ChatOpenAI(model="gpt-4o-mini", api_key="sk-prueba")
+    llm = ChatOpenAI(model="gpt-4o-mini", api_key=secrets.token_hex(12))
     assert construir_interprete(llm) is not None
 
 

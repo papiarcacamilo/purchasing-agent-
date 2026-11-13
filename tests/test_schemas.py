@@ -1,4 +1,6 @@
 """Pruebas de los esquemas Pydantic (sin red y sin clave)."""
+import secrets
+
 import pytest
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
@@ -63,7 +65,7 @@ def test_esquema_compatible_con_salida_estructurada_estricta(modelo):
 
 def test_el_llm_acepta_el_esquema_en_modo_estricto():
     # Clave falsa: construir la cadena no hace llamadas de red.
-    llm = ChatOpenAI(model="gpt-4o-mini", api_key="sk-prueba")
+    llm = ChatOpenAI(model="gpt-4o-mini", api_key=secrets.token_hex(12))
     assert llm.with_structured_output(Pedido, method="json_schema", strict=True) is not None
 
 
