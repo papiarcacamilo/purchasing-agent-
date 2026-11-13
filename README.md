@@ -1,4 +1,4 @@
-# Cotizador de compras de mercado (LangGraph + LangChain + Pydantic)
+# Agentes de compras de mercado (LangGraph + LangChain + Pydantic)
 
 Ejercicio académico: una solicitud de compra entra por consola, un LLM de OpenAI la
 convierte en un pedido estructurado con **salida estructurada**, un agente consulta los
