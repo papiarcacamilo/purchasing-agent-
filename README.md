@@ -199,7 +199,7 @@ Entregable 4 final/
 │   ├── herramientas/            # una herramienta de búsqueda por proveedor
 │   └── nodos/                   # un archivo por nodo
 ├── informes/informe.docx        # informe generado por el agente
-└── tests/                       # 176 pruebas, sin red ni clave real
+└── tests/                       # 177 pruebas, sin red ni clave real
 ```
 
 ## Pruebas
@@ -208,18 +208,8 @@ Entregable 4 final/
 uv run pytest -q
 ```
 
-**176 pruebas, todas sin red y sin clave**: el LLM se reemplaza por funciones falsas con
+**177 pruebas, todas sin red y sin clave**: el LLM se reemplaza por funciones falsas con
 guion, inyectadas en `construir_grafo(...)`. Así se verifica la orquestación —quién llama a
 quién, cuándo se corta un ciclo, qué se recolecta— sin depender de lo que decida un modelo
 real. Hay pruebas que comprueban lo contrario de lo esperado: un modelo que desobedece una
 instrucción del prompt, y otro que inventa un precio en la recomendación.
-
-## Diferencias con el repositorio de clase
-
-| Pieza | `sistema_quejas` | Este proyecto |
-|---|---|---|
-| Estado | `EstadoQueja`, reducer en `historial` | `EstadoCompra`: pedido, ofertas, presupuestos, informe |
-| Rutas | 3 condicionales, sin ciclos | 3 condicionales y 2 ciclos con tope |
-| Herramientas | No tiene | `StructuredTool`, `bind_tools` y `ToolNode` |
-| Intervención humana | Pregunta por consola inyectada | `interrupt()` con checkpointer |
-| Salida | Resultado en consola | Informe en Word o Markdown, con fuentes |

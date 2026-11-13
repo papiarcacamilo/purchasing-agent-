@@ -177,3 +177,13 @@ def test_sin_modelo_la_recomendacion_la_escribe_el_codigo():
 
 def test_sin_presupuestos_lo_dice_en_vez_de_recomendar():
     assert "no hay una compra que recomendar" in recomendacion_por_codigo(EstadoCompra())
+
+
+def test_el_word_no_lleva_las_etiquetas_de_la_plantilla(tmp_path):
+    from docx import Document
+
+    informe = construir_informe(_estado(), recomendacion="r", fecha=str(HOY))
+    propiedades = Document(str(a_word(informe, tmp_path / "i.docx"))).core_properties
+    assert propiedades.author == "Cotizador de compras"
+    assert propiedades.title == "Informe de cotización de compra"
+    assert "python-docx" not in (propiedades.comments or "")
