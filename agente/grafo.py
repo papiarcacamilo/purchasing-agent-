@@ -19,10 +19,10 @@ from langchain_core.tools import BaseTool
 from langgraph.graph import END, START, StateGraph
 from langgraph.prebuilt import ToolNode
 
-from cotizador.herramientas import crear_herramientas
+from agente.herramientas import crear_herramientas
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
-from cotizador.nodos import (
+from agente.nodos import (
     calcular_presupuesto,
     crear_nodo_agente_buscador,
     crear_nodo_clasificar,
@@ -34,8 +34,8 @@ from cotizador.nodos import (
     pedir_aclaracion,
     validar_pedido,
 )
-from cotizador.routers import enrutar_aclaracion, enrutar_busqueda, enrutar_validacion
-from cotizador.schemas import EstadoCompra, Oferta
+from agente.routers import enrutar_aclaracion, enrutar_busqueda, enrutar_validacion
+from agente.schemas import EstadoCompra, Oferta
 
 
 def construir_grafo(
@@ -53,7 +53,7 @@ def construir_grafo(
     con OpenAI en producción y con funciones falsas en las pruebas.
     """
     if catalogos is None:
-        from cotizador.catalogos import cargar_catalogos
+        from agente.catalogos import cargar_catalogos
 
         catalogos = cargar_catalogos()
     if herramientas is None:
@@ -63,7 +63,7 @@ def construir_grafo(
     # vienen inyectados -como en las pruebas- no se exige la clave por él.
     if interprete is None or buscador is None or clasificador is None:
         # Se importa aquí para no exigir la clave cuando todo se inyecta.
-        from cotizador.llm import (
+        from agente.llm import (
             construir_buscador,
             construir_clasificador,
             construir_interprete,

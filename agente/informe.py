@@ -17,7 +17,7 @@ Así las tablas caben en una página y cada precio queda rastreable.
 """
 from typing import Optional
 
-from cotizador.schemas import EstadoCompra, Informe, Oferta, Presupuesto, Seccion, Tabla
+from agente.schemas import EstadoCompra, Informe, Oferta, Presupuesto, Seccion, Tabla
 
 SIN_DATO = "—"
 

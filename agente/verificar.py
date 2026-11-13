@@ -1,7 +1,7 @@
 """Comprueba la configuración y la conexión con OpenAI.
 
 Uso:
-    uv run python -m cotizador.verificar
+    uv run python -m agente.verificar
 
 Hace una sola llamada mínima al modelo. Nunca imprime la clave.
 """
@@ -11,8 +11,8 @@ import sys
 import openai
 from langchain_openai import ChatOpenAI
 
-from cotizador.config import cargar_config
-from cotizador.errores import explicar_error_openai
+from agente.config import cargar_config
+from agente.errores import explicar_error_openai
 
 
 def main() -> int:

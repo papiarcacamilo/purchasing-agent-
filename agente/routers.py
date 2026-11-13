@@ -2,9 +2,9 @@
 
 Reciben el estado y devuelven la CLAVE del siguiente nodo. No modifican el estado.
 """
-from cotizador.nodos.buscar import MAX_VUELTAS, vueltas_usadas
-from cotizador.nodos.validar import necesita_aclaracion
-from cotizador.schemas import EstadoCompra
+from agente.nodos.buscar import MAX_VUELTAS, vueltas_usadas
+from agente.nodos.validar import necesita_aclaracion
+from agente.schemas import EstadoCompra
 
 
 def enrutar_aclaracion(state: EstadoCompra) -> str:

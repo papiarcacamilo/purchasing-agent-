@@ -6,7 +6,7 @@ subcadenas: así "papa" no coincide con "papel" y "huevos" sí coincide con "hue
 import re
 import unicodedata
 
-from cotizador.schemas import Oferta
+from agente.schemas import Oferta
 
 # Palabras que no ayudan a identificar un producto.
 VACIAS = {"de", "del", "la", "el", "los", "las", "en", "con", "para", "por", "x", "y", "un", "una"}

@@ -3,12 +3,12 @@
 Arma un presupuesto por cada tienda consultada y, si vale la pena, una compra
 combinada. Todo en código: los números deben poder comprobarse.
 """
-from cotizador.presupuesto import (
+from agente.presupuesto import (
     presupuesto_combinado,
     presupuesto_de_tienda,
     vale_la_pena_combinar,
 )
-from cotizador.schemas import EstadoCompra
+from agente.schemas import EstadoCompra
 
 
 def _pesos(valor: float) -> str:

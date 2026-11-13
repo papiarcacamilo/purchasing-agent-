@@ -3,13 +3,13 @@ from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 from langgraph.checkpoint.memory import InMemorySaver
 
-from cotizador.ejecutar import ejecutar
-from cotizador.grafo import construir_grafo
-from cotizador.nodos.aclarar import MARCA_ACLARACION, componer_solicitud
-from cotizador.nodos.validar import MAX_ACLARACIONES, datos_que_faltan, validar_pedido
-from cotizador.prompts import PROMPT_SISTEMA
-from cotizador.routers import enrutar_aclaracion, enrutar_validacion
-from cotizador.schemas import (
+from agente.ejecutar import ejecutar
+from agente.grafo import construir_grafo
+from agente.nodos.aclarar import MARCA_ACLARACION, componer_solicitud
+from agente.nodos.validar import MAX_ACLARACIONES, datos_que_faltan, validar_pedido
+from agente.prompts import PROMPT_SISTEMA
+from agente.routers import enrutar_aclaracion, enrutar_validacion
+from agente.schemas import (
     ClasificacionLote,
     EstadoCompra,
     ItemPedido,

@@ -3,14 +3,14 @@ from datetime import date
 
 from langchain_core.runnables import RunnableLambda
 
-from cotizador.nodos.clasificar import (
+from agente.nodos.clasificar import (
     TOPE_POR_PROVEEDOR,
     crear_nodo_clasificar,
     seleccionar_candidatas,
 )
-from cotizador.nodos.normalizar import normalizar_ofertas
-from cotizador.prompts import encargo_de_clasificacion
-from cotizador.schemas import (
+from agente.nodos.normalizar import normalizar_ofertas
+from agente.prompts import encargo_de_clasificacion
+from agente.schemas import (
     ClasificacionLote,
     ClasificacionOferta,
     EstadoCompra,
@@ -61,7 +61,7 @@ def _clasificador(*valores):
 
 def test_el_prompt_prohibe_castigar_el_tamano_del_empaque():
     """Fallo real: una botella de 900 mL se marcó sustituto al pedir 1 litro."""
-    from cotizador.prompts import PROMPT_CLASIFICADOR
+    from agente.prompts import PROMPT_CLASIFICADOR
 
     assert "El TAMAÑO DEL EMPAQUE no influye" in PROMPT_CLASIFICADOR
     assert "cuántos empaques hacen falta" in PROMPT_CLASIFICADOR

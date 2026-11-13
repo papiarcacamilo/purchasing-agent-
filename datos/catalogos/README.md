@@ -30,7 +30,7 @@ esa oferta se marcará como no comparable.
 ## Comprobar los catálogos
 
 ```bash
-uv run python -m cotizador.catalogos
+uv run python -m agente.catalogos
 ```
 
 Si alguna fila tiene un error, el mensaje indica el archivo y el número de fila.

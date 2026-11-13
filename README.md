@@ -21,10 +21,10 @@ fuentes verificables, declarando lo que no pudo verificar.
 
 | Entregable | Dónde |
 |---|---|
-| La solución (grafo, nodos, herramientas) | `cotizador/` y `main.py` |
+| La solución (grafo, nodos, herramientas) | `agente/` y `main.py` |
 | Informe generado por el agente | `informes/informe.docx` |
 | Memoria del proyecto: desarrollo, arquitectura, decisiones y resultados | `Memoria del Proyecto.docx` |
-| Recorrido del sistema pieza por pieza, ejecutable | `notebooks/cotizador.ipynb` |
+| Recorrido del sistema pieza por pieza, ejecutable | `notebooks/agente.ipynb` |
 | Pruebas automáticas | `tests/` |
 | Catálogos de precios con sus fuentes | `datos/catalogos/` |
 | Diagrama del grafo | `docs/grafo.mmd` y en este README |
@@ -84,7 +84,7 @@ graph TD;
 Hay **tres aristas condicionales** (validación, aclaración y búsqueda) y **dos ciclos**:
 el de aclaración con el usuario y el del agente con sus herramientas. Los dos tienen tope
 (`MAX_ACLARACIONES` y `MAX_VUELTAS`): un ciclo sin condición de salida y sin límite es un
-ciclo infinito esperando el momento. Las funciones de ruteo están en `cotizador/routers.py`.
+ciclo infinito esperando el momento. Las funciones de ruteo están en `agente/routers.py`.
 
 La pausa para preguntar usa `interrupt()` con un *checkpointer*: el grafo guarda su estado,
 sale, y se reanuda con `Command(resume=...)` cuando llega la respuesta. Quien responda
@@ -180,8 +180,8 @@ Entregable 4 final/
 ├── .env.example                 # copiar a .env (la clave nunca se sube)
 ├── docs/grafo.mmd               # diagrama Mermaid generado con --mermaid
 ├── datos/catalogos/             # exito.csv, carulla.csv, ara.csv y su README
-├── notebooks/cotizador.ipynb    # recorrido del sistema, pieza por pieza
-├── cotizador/
+├── notebooks/agente.ipynb       # recorrido del sistema, pieza por pieza
+├── agente/
 │   ├── config.py                # lectura de .env, con la clave oculta
 │   ├── errores.py               # traduce los errores de OpenAI a una línea
 │   ├── schemas.py               # modelos Pydantic: pedido, oferta, presupuesto, informe

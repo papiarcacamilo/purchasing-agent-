@@ -13,7 +13,7 @@ Se distinguen dos cosas:
 """
 from typing import Optional
 
-from cotizador.schemas import EstadoCompra, Pedido
+from agente.schemas import EstadoCompra, Pedido
 
 # Tope de preguntas. Sin tope, un usuario que nunca responde lo que falta
 # dejaría el grafo preguntando en círculo.

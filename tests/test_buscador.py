@@ -10,16 +10,16 @@ import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain_core.runnables import RunnableLambda
 
-from cotizador.grafo import construir_grafo
-from cotizador.herramientas import crear_herramientas
-from cotizador.nodos.buscar import (
+from agente.grafo import construir_grafo
+from agente.herramientas import crear_herramientas
+from agente.nodos.buscar import (
     MAX_VUELTAS,
     crear_nodo_agente_buscador,
     proveedores_a_consultar,
     vueltas_usadas,
 )
-from cotizador.routers import enrutar_busqueda
-from cotizador.schemas import ClasificacionLote, EstadoCompra, ItemPedido, Oferta, Pedido
+from agente.routers import enrutar_busqueda
+from agente.schemas import ClasificacionLote, EstadoCompra, ItemPedido, Oferta, Pedido
 
 
 def _oferta(proveedor: str, nombre: str, precio: float, **extra) -> Oferta:
@@ -96,7 +96,7 @@ def test_un_proveedor_sin_catalogo_se_reporta_y_no_deja_la_busqueda_vacia():
 
 def test_el_prompt_obliga_a_reintentar_cuando_no_hay_resultados():
     """Si una tienda no tiene la variedad exacta, debe reintentar con el término general."""
-    from cotizador.prompts import PROMPT_BUSCADOR
+    from agente.prompts import PROMPT_BUSCADOR
 
     assert "DEBES reintentarla" in PROMPT_BUSCADOR
     assert '"arroz integral" -> "arroz"' in PROMPT_BUSCADOR

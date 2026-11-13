@@ -5,9 +5,9 @@ from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 
 import main as cli
-from cotizador import ejecutar as ejecutar_mod
-from cotizador.errores import explicar_error_openai
-from cotizador.schemas import ClasificacionLote
+from agente import ejecutar as ejecutar_mod
+from agente.errores import explicar_error_openai
+from agente.schemas import ClasificacionLote
 
 PETICION = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
 
@@ -34,7 +34,7 @@ def test_main_muestra_una_linea_clara_y_no_una_traza(monkeypatch, capsys):
 
     # Se sustituye el intérprete real por uno que falla como una clave rechazada.
     # El buscador también se inyecta: así nada del grafo pide la clave.
-    # `main` ya no construye el grafo: lo hace `cotizador.ejecutar`, que es
+    # `main` ya no construye el grafo: lo hace `agente.ejecutar`, que es
     # donde hay que interceptarlo.
     grafo_real = ejecutar_mod.construir_grafo
     sin_busqueda = RunnableLambda(lambda _: AIMessage(content="no busco nada"))

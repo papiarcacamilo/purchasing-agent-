@@ -3,10 +3,10 @@ from datetime import date
 
 import pytest
 
-from cotizador.busqueda import buscar_ofertas, palabras_clave
-from cotizador.catalogos import cargar_catalogos
-from cotizador.herramientas import crear_herramienta_proveedor, crear_herramientas, nombre_herramienta
-from cotizador.schemas import Oferta
+from agente.busqueda import buscar_ofertas, palabras_clave
+from agente.catalogos import cargar_catalogos
+from agente.herramientas import crear_herramienta_proveedor, crear_herramientas, nombre_herramienta
+from agente.schemas import Oferta
 
 
 def _oferta(nombre: str, precio: float, **extra) -> Oferta:

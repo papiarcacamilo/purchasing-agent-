@@ -4,9 +4,9 @@ from typing import get_args
 from langchain_core.runnables import RunnableLambda
 from langchain_openai import ChatOpenAI
 
-from cotizador.llm import construir_interprete
-from cotizador.prompts import PROMPT_SISTEMA, crear_prompt_interprete
-from cotizador.schemas import ItemPedido, Pedido, Unidad
+from agente.llm import construir_interprete
+from agente.prompts import PROMPT_SISTEMA, crear_prompt_interprete
+from agente.schemas import ItemPedido, Pedido, Unidad
 
 
 def test_el_texto_del_usuario_va_solo_en_el_mensaje_humano_y_delimitado():

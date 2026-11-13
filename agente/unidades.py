@@ -14,7 +14,7 @@ La libra se toma como 500 g, que es la libra de mercado usada en Colombia
 """
 from typing import Optional
 
-from cotizador.schemas import Unidad
+from agente.schemas import Unidad
 
 # unidad -> (dimensión, numerador, denominador) para llevarla a la unidad base.
 # Se guarda como fracción para que 1000 g den exactamente 1 kg, sin error de coma flotante.

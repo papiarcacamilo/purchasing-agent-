@@ -3,15 +3,15 @@ from datetime import date
 
 from langchain_core.runnables import RunnableLambda
 
-from cotizador.informe import a_markdown, construir_informe, pesos
-from cotizador.informe_word import a_word
-from cotizador.nodos.informar import (
+from agente.informe import a_markdown, construir_informe, pesos
+from agente.informe_word import a_word
+from agente.nodos.informar import (
     cifras_calculadas,
     cifras_inventadas,
     crear_nodo_redactar_informe,
     recomendacion_por_codigo,
 )
-from cotizador.schemas import (
+from agente.schemas import (
     EstadoCompra,
     ItemPedido,
     LineaPresupuesto,

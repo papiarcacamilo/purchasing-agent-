@@ -4,7 +4,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from pydantic import ValidationError
 
-from cotizador.schemas import EstadoCompra, ItemPedido, Pedido
+from agente.schemas import EstadoCompra, ItemPedido, Pedido
 
 
 def _item(**cambios) -> dict:

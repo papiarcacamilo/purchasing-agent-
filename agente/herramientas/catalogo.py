@@ -12,9 +12,9 @@ Devuelven dos cosas (response_format="content_and_artifact"):
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from cotizador.busqueda import buscar_ofertas, normalizar
-from cotizador.catalogos import cargar_catalogos
-from cotizador.schemas import Oferta
+from agente.busqueda import buscar_ofertas, normalizar
+from agente.catalogos import cargar_catalogos
+from agente.schemas import Oferta
 
 
 class EntradaBusqueda(BaseModel):

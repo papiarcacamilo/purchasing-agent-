@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from cotizador.catalogos import (
+from agente.catalogos import (
     COLUMNAS,
     DIRECTORIO_CATALOGOS,
     ErrorCatalogo,

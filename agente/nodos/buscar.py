@@ -8,10 +8,10 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from langchain_core.runnables import Runnable
 from langchain_core.tools import BaseTool
 
-from cotizador.busqueda import buscar_ofertas, coincide, normalizar
-from cotizador.herramientas import nombre_herramienta
-from cotizador.prompts import PROMPT_BUSCADOR, encargo_de_busqueda
-from cotizador.schemas import EstadoCompra, Oferta, ResultadoBusqueda
+from agente.busqueda import buscar_ofertas, coincide, normalizar
+from agente.herramientas import nombre_herramienta
+from agente.prompts import PROMPT_BUSCADOR, encargo_de_busqueda
+from agente.schemas import EstadoCompra, Oferta, ResultadoBusqueda
 
 # Tope de vueltas del ciclo: evita que una conversación se alargue sin control.
 MAX_VUELTAS = 4

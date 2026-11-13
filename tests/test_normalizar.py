@@ -3,8 +3,8 @@ from datetime import date
 
 import pytest
 
-from cotizador.nodos.normalizar import normalizar_oferta, normalizar_ofertas
-from cotizador.schemas import EstadoCompra, ItemPedido, Oferta, ResultadoBusqueda
+from agente.nodos.normalizar import normalizar_oferta, normalizar_ofertas
+from agente.schemas import EstadoCompra, ItemPedido, Oferta, ResultadoBusqueda
 
 
 def _oferta(nombre="Arroz de prueba", precio=6790, contenido=1000, unidad="g", **extra) -> Oferta:

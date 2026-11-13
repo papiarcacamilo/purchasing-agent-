@@ -12,14 +12,14 @@ Tres reglas acordadas con el equipo y exigidas por el enunciado:
 """
 from typing import Optional
 
-from cotizador.schemas import (
+from agente.schemas import (
     ItemPedido,
     LineaPresupuesto,
     OfertaNormalizada,
     Presupuesto,
     ResultadoBusqueda,
 )
-from cotizador.unidades import a_base, paquetes_necesarios, son_comparables
+from agente.unidades import a_base, paquetes_necesarios, son_comparables
 
 # Primero lo que el usuario pidió; el sustituto solo si no hay equivalente.
 PREFERENCIA = {"equivalente": 0, "sustituto": 1}

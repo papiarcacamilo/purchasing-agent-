@@ -18,9 +18,9 @@ from typing import Optional
 
 from langchain_core.runnables import Runnable
 
-from cotizador.informe import construir_informe, enumerar, pesos
-from cotizador.prompts import encargo_de_recomendacion
-from cotizador.schemas import EstadoCompra
+from agente.informe import construir_informe, enumerar, pesos
+from agente.prompts import encargo_de_recomendacion
+from agente.schemas import EstadoCompra
 
 # Solo se verifican los números grandes: son los precios. Las cantidades
 # pequeñas ("2 kg", "3 productos") no son cifras de dinero y exigirlas en la

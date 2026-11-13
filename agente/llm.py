@@ -7,13 +7,13 @@ from langchain_openai import ChatOpenAI
 
 from langchain_core.tools import BaseTool
 
-from cotizador.config import cargar_config
-from cotizador.prompts import (
+from agente.config import cargar_config
+from agente.prompts import (
     PROMPT_CLASIFICADOR,
     PROMPT_RECOMENDACION,
     crear_prompt_interprete,
 )
-from cotizador.schemas import ClasificacionLote, Pedido
+from agente.schemas import ClasificacionLote, Pedido
 
 
 def crear_modelo() -> ChatOpenAI:

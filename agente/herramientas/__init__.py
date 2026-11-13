@@ -1,4 +1,4 @@
-from cotizador.herramientas.catalogo import (
+from agente.herramientas.catalogo import (
     EntradaBusqueda,
     crear_herramienta_proveedor,
     crear_herramientas,

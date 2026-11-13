@@ -12,8 +12,8 @@ from typing import Callable, Optional
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
 
-from cotizador.grafo import construir_grafo
-from cotizador.schemas import EstadoCompra
+from agente.grafo import construir_grafo
+from agente.schemas import EstadoCompra
 
 # Tope de seguridad del lado de quien ejecuta. El grafo ya tiene el suyo
 # (MAX_ACLARACIONES); este protege contra un grafo mal cableado.

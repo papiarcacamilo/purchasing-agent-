@@ -3,8 +3,8 @@ from datetime import date
 
 import pytest
 
-from cotizador.nodos.presupuestar import calcular_presupuesto
-from cotizador.presupuesto import (
+from agente.nodos.presupuestar import calcular_presupuesto
+from agente.presupuesto import (
     costo_de,
     elegir_mejor,
     paquetes_para,
@@ -12,14 +12,14 @@ from cotizador.presupuesto import (
     presupuesto_de_tienda,
     vale_la_pena_combinar,
 )
-from cotizador.schemas import (
+from agente.schemas import (
     EstadoCompra,
     ItemPedido,
     Oferta,
     OfertaNormalizada,
     ResultadoBusqueda,
 )
-from cotizador.unidades import a_base, precio_por_unidad
+from agente.unidades import a_base, precio_por_unidad
 
 
 def _norm(nombre, precio, contenido, unidad="g", proveedor="Éxito", equivalencia="equivalente"):

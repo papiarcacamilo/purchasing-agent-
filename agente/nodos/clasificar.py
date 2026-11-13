@@ -13,9 +13,9 @@ Es un juicio de lenguaje, así que lo hace el LLM. Dos salvedades:
 """
 from langchain_core.runnables import Runnable
 
-from cotizador.busqueda import palabras_clave
-from cotizador.prompts import encargo_de_clasificacion
-from cotizador.schemas import EstadoCompra, ItemPedido, OfertaNormalizada, ResultadoBusqueda
+from agente.busqueda import palabras_clave
+from agente.prompts import encargo_de_clasificacion
+from agente.schemas import EstadoCompra, ItemPedido, OfertaNormalizada, ResultadoBusqueda
 
 # Cuántas ofertas (las más baratas por unidad) se clasifican por proveedor.
 TOPE_POR_PROVEEDOR = 4

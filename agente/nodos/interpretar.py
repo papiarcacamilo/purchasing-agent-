@@ -1,7 +1,7 @@
 """Nodo 1: interpreta la solicitud con el LLM (salida estructurada)."""
 from langchain_core.runnables import Runnable
 
-from cotizador.schemas import EstadoCompra
+from agente.schemas import EstadoCompra
 
 
 def crear_nodo_interpretar(cadena: Runnable):

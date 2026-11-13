@@ -1,7 +1,7 @@
 """Pruebas de la conversión de unidades (código puro, sin red ni clave)."""
 import pytest
 
-from cotizador.unidades import (
+from agente.unidades import (
     UnidadDesconocida,
     a_base,
     convertir,

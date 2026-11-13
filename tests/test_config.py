@@ -1,7 +1,7 @@
 """Pruebas de la configuración: sin red y sin usar la clave real."""
 import pytest
 
-from cotizador.config import cargar_config
+from agente.config import cargar_config
 
 
 def test_falla_si_no_hay_clave(monkeypatch):

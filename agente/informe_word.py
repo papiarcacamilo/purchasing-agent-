@@ -9,7 +9,7 @@ from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Cm, Pt
 
-from cotizador.informe import Informe, Tabla
+from agente.informe import Informe, Tabla
 
 # Estilo incluido en la plantilla por defecto de Word. Si no existiera, la
 # tabla se escribe igual pero sin bordes.

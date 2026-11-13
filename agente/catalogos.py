@@ -9,7 +9,7 @@ punto y coma, codificación de Windows, precios como "$ 4.990" y fechas como
 "11/11/2026".
 
 Uso:
-    uv run python -m cotizador.catalogos        # resumen de los catálogos cargados
+    uv run python -m agente.catalogos        # resumen de los catálogos cargados
 """
 import csv
 import re
@@ -19,7 +19,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from cotizador.schemas import Oferta
+from agente.schemas import Oferta
 
 DIRECTORIO_CATALOGOS = Path(__file__).resolve().parent.parent / "datos" / "catalogos"
 

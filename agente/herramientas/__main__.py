@@ -1,12 +1,12 @@
 """Prueba manual de las herramientas, sin LLM ni clave.
 
 Uso:
-    uv run python -m cotizador.herramientas "arroz"
-    uv run python -m cotizador.herramientas "papel higienico"
+    uv run python -m agente.herramientas "arroz"
+    uv run python -m agente.herramientas "papel higienico"
 """
 import sys
 
-from cotizador.herramientas import crear_herramientas
+from agente.herramientas import crear_herramientas
 
 
 def main() -> int:

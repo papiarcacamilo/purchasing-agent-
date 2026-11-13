@@ -10,8 +10,8 @@ Una oferta se marca como NO comparable, con su motivo, cuando:
 
 No se descarta: el enunciado pide informar lo no comparable, no esconderlo.
 """
-from cotizador.schemas import EstadoCompra, ItemPedido, Oferta, OfertaNormalizada, ResultadoBusqueda
-from cotizador.unidades import (
+from agente.schemas import EstadoCompra, ItemPedido, Oferta, OfertaNormalizada, ResultadoBusqueda
+from agente.unidades import (
     NOMBRE_DIMENSION,
     a_base,
     dimension,

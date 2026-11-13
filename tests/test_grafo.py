@@ -5,9 +5,9 @@ from datetime import date
 from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 
-from cotizador.grafo import construir_grafo
-from cotizador.nodos import crear_nodo_interpretar
-from cotizador.schemas import ClasificacionLote, EstadoCompra, ItemPedido, Oferta, Pedido
+from agente.grafo import construir_grafo
+from agente.nodos import crear_nodo_interpretar
+from agente.schemas import ClasificacionLote, EstadoCompra, ItemPedido, Oferta, Pedido
 
 # Catálogo mínimo: estas pruebas miran el nodo de interpretación, no la búsqueda.
 CATALOGO = {
@@ -128,7 +128,7 @@ def test_mermaid_funciona_sin_clave(monkeypatch, capsys):
     import main
 
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    monkeypatch.setattr("cotizador.config.cargar_config", _no_debe_pedir_clave)
+    monkeypatch.setattr("agente.config.cargar_config", _no_debe_pedir_clave)
     monkeypatch.setattr(sys, "argv", ["main.py", "--mermaid"])
 
     assert main.main() == 0

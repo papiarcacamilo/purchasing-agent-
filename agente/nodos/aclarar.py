@@ -15,8 +15,8 @@ necesitaba, pero no puede reanudarse.
 """
 from langgraph.types import interrupt
 
-from cotizador.nodos.validar import MAX_ACLARACIONES
-from cotizador.schemas import EstadoCompra
+from agente.nodos.validar import MAX_ACLARACIONES
+from agente.schemas import EstadoCompra
 
 # Marca el bloque de diálogo dentro de la solicitud. El prompt del intérprete
 # conoce esta misma marca y sabe que lo que viene después NO es un producto

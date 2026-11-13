@@ -1,16 +1,16 @@
 """Prueba manual de la cadena de interpretación.
 
 Uso:
-    uv run python -m cotizador.demo --prompt "Necesito 5 kg de arroz para Medellín"
+    uv run python -m agente.demo --prompt "Necesito 5 kg de arroz para Medellín"
         Muestra los mensajes que recibiría el modelo. No usa la API ni la clave.
 
-    uv run python -m cotizador.demo "Necesito 5 kg de arroz para Medellín"
+    uv run python -m agente.demo "Necesito 5 kg de arroz para Medellín"
         Llama al modelo y muestra el Pedido estructurado. Requiere una clave válida.
 """
 import argparse
 import sys
 
-from cotizador.prompts import crear_prompt_interprete
+from agente.prompts import crear_prompt_interprete
 
 EJEMPLO = (
     "Necesito 5 kg de arroz, 2 litros de aceite y 3 kg de azúcar. "
@@ -39,8 +39,8 @@ def main() -> int:
     # Se importan aquí para que --prompt funcione sin clave.
     import openai
 
-    from cotizador.errores import explicar_error_openai
-    from cotizador.llm import construir_interprete
+    from agente.errores import explicar_error_openai
+    from agente.llm import construir_interprete
 
     try:
         pedido = construir_interprete().invoke({"texto_usuario": args.texto})

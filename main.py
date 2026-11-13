@@ -10,23 +10,23 @@ import sys
 
 import openai
 
-from cotizador.ejecutar import ejecutar
-from cotizador.errores import explicar_error_openai
-from cotizador.grafo import construir_grafo
+from agente.ejecutar import ejecutar
+from agente.errores import explicar_error_openai
+from agente.grafo import construir_grafo
 
 
 def guardar_informe(estado, ruta: str) -> str:
     """Escribe el informe del estado en `ruta`. La extensión elige el formato."""
     from pathlib import Path
 
-    from cotizador.informe import a_markdown
+    from agente.informe import a_markdown
 
     if estado.informe is None:
         return "no se generó informe (el grafo no llegó a redactarlo)"
 
     destino = Path(ruta)
     if destino.suffix.lower() == ".docx":
-        from cotizador.informe_word import a_word
+        from agente.informe_word import a_word
 
         return str(a_word(estado.informe, destino))
 
