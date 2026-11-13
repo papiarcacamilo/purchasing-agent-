@@ -253,3 +253,34 @@ def encargo_de_clasificacion(item, normalizadas) -> str:
             f"| {oferta.proveedor}"
         )
     return "\n".join([*pedido, *lineas])
+
+
+# ---------------------------------------------------------------------------
+# Prompt de la recomendación final (actividad 4.1)
+# ---------------------------------------------------------------------------
+# El modelo NO calcula: recibe las cifras ya calculadas y solo las explica.
+# Después, el código comprueba que cada cifra de su texto exista de verdad.
+
+PROMPT_RECOMENDACION = """\
+Eres un asesor de compras. Escribes la recomendación final de un informe de \
+cotización, dirigida a quien va a hacer la compra.
+
+Escribe UN SOLO PÁRRAFO de máximo seis frases, en español neutro, sin títulos \
+ni viñetas.
+
+Reglas:
+1. Usa únicamente las cifras del resumen que recibes. No sumes, no restes y no \
+redondees: si necesitas un número, cópialo tal como aparece.
+2. Di qué opción recomiendas y por qué, en términos de cuánto cuesta y cuántos \
+productos cubre.
+3. Si el resumen trae una compra combinada, menciona que obliga a comprar en \
+más de una tienda y que el envío no está verificado en ninguna.
+4. Si algún producto quedó sin cotización o resuelto con un sustituto, dilo.
+5. No inventes marcas, tiendas, plazos ni condiciones que no estén en el resumen.
+"""
+
+
+def encargo_de_recomendacion(resumen: list[str]) -> str:
+    """Arma el texto con las cifras ya calculadas que leerá el modelo."""
+    lineas = "\n".join(f"- {linea}" for linea in resumen)
+    return f"Resumen del presupuesto ya calculado:\n{lineas}"

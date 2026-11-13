@@ -1,4 +1,0 @@
-proveedor,nombre,marca,presentacion,contenido,unidad_contenido,precio,moneda,ciudad,disponible,url,id_fuente,fecha_consulta
-Tienda Ficticia,Arroz blanco de prueba,Marca Prueba,Bolsa x 1000 g,1000,g,4990,COP,Ciudad Prueba,si,https://example.com/arroz-1000g,TF-001,2026-11-11
-Tienda Ficticia,Aceite de prueba,,Botella x 900 mL,900,mL,$ 12.500,,Ciudad Prueba,no,https://example.com/aceite-900ml,,2026-11-11
-Tienda Ficticia,Huevos de prueba,Marca Prueba,Cubeta x 30,30,unidad,18.900,COP,,,https://example.com/huevos-30,TF-003,11/11/2026

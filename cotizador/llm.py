@@ -8,7 +8,11 @@ from langchain_openai import ChatOpenAI
 from langchain_core.tools import BaseTool
 
 from cotizador.config import cargar_config
-from cotizador.prompts import PROMPT_CLASIFICADOR, crear_prompt_interprete
+from cotizador.prompts import (
+    PROMPT_CLASIFICADOR,
+    PROMPT_RECOMENDACION,
+    crear_prompt_interprete,
+)
 from cotizador.schemas import ClasificacionLote, Pedido
 
 
@@ -44,6 +48,24 @@ def construir_buscador(
     """
     llm = llm or crear_modelo()
     return llm.bind_tools(herramientas)
+
+
+def construir_redactor(llm: Optional[BaseChatModel] = None) -> Runnable:
+    """Cadena que redacta el párrafo de recomendación del informe.
+
+    Entrada : {"encargo": str} con las cifras ya calculadas.
+    Salida  : texto plano. Aquí no se usa salida estructurada porque lo que se
+              pide es prosa; la garantía no la da el esquema sino la
+              comprobación numérica posterior.
+    """
+    from langchain_core.output_parsers import StrOutputParser
+    from langchain_core.prompts import ChatPromptTemplate
+
+    llm = llm or crear_modelo()
+    prompt = ChatPromptTemplate.from_messages(
+        [("system", PROMPT_RECOMENDACION), ("human", "{encargo}")]
+    )
+    return prompt | llm | StrOutputParser()
 
 
 def construir_clasificador(llm: Optional[BaseChatModel] = None) -> Runnable:

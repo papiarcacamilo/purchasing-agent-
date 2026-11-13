@@ -7,7 +7,8 @@ Flujo completo:
              validar_pedido   -> preparar_busqueda -> agente_buscador
              agente_buscador <-> herramientas        (ciclo del agente)
              agente_buscador  -> recolectar_ofertas -> normalizar_ofertas
-                              -> clasificar_equivalencia -> calcular_presupuesto -> END
+                              -> clasificar_equivalencia -> calcular_presupuesto
+                              -> redactar_informe -> END
 
 Hay dos ciclos y los dos tienen tope: MAX_ACLARACIONES y MAX_VUELTAS.
 """
@@ -28,6 +29,7 @@ from cotizador.nodos import (
     crear_nodo_interpretar,
     crear_nodo_preparar_busqueda,
     crear_nodo_recolectar,
+    crear_nodo_redactar_informe,
     normalizar_ofertas,
     pedir_aclaracion,
     validar_pedido,
@@ -40,6 +42,7 @@ def construir_grafo(
     interprete: Optional[Runnable] = None,
     buscador: Optional[Runnable] = None,
     clasificador: Optional[Runnable] = None,
+    redactor: Optional[Runnable] = None,
     catalogos: Optional[dict[str, list[Oferta]]] = None,
     herramientas: Optional[list[BaseTool]] = None,
     checkpointer: Optional[BaseCheckpointSaver] = None,
@@ -55,13 +58,22 @@ def construir_grafo(
         catalogos = cargar_catalogos()
     if herramientas is None:
         herramientas = crear_herramientas(catalogos)
+    # El redactor acompaña a los tres obligatorios: el nodo del informe sabe
+    # trabajar sin modelo (escribe la recomendación por código), así que si ya
+    # vienen inyectados -como en las pruebas- no se exige la clave por él.
     if interprete is None or buscador is None or clasificador is None:
         # Se importa aquí para no exigir la clave cuando todo se inyecta.
-        from cotizador.llm import construir_buscador, construir_clasificador, construir_interprete
+        from cotizador.llm import (
+            construir_buscador,
+            construir_clasificador,
+            construir_interprete,
+            construir_redactor,
+        )
 
         interprete = interprete or construir_interprete()
         buscador = buscador or construir_buscador(herramientas)
         clasificador = clasificador or construir_clasificador()
+        redactor = redactor or construir_redactor()
 
     g = StateGraph(EstadoCompra)
 
@@ -78,6 +90,7 @@ def construir_grafo(
     g.add_node("normalizar_ofertas", normalizar_ofertas)
     g.add_node("clasificar_equivalencia", crear_nodo_clasificar(clasificador))
     g.add_node("calcular_presupuesto", calcular_presupuesto)
+    g.add_node("redactar_informe", crear_nodo_redactar_informe(redactor))
 
     # --- Aristas ---
     g.add_edge(START, "interpretar_pedido")
@@ -101,7 +114,8 @@ def construir_grafo(
     g.add_edge("recolectar_ofertas", "normalizar_ofertas")
     g.add_edge("normalizar_ofertas", "clasificar_equivalencia")
     g.add_edge("clasificar_equivalencia", "calcular_presupuesto")
-    g.add_edge("calcular_presupuesto", END)
+    g.add_edge("calcular_presupuesto", "redactar_informe")
+    g.add_edge("redactar_informe", END)
 
     # Sin checkpointer el grafo funciona, pero si se detiene a preguntar no
     # puede reanudarse: no hay dónde guardar el estado de la pausa.

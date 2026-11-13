@@ -115,7 +115,8 @@ def test_el_diagrama_del_grafo_empieza_por_la_interpretacion():
     assert "recolectar_ofertas --> normalizar_ofertas" in mermaid
     assert "normalizar_ofertas --> clasificar_equivalencia" in mermaid
     assert "clasificar_equivalencia --> calcular_presupuesto" in mermaid
-    assert "calcular_presupuesto --> __end__" in mermaid
+    assert "calcular_presupuesto --> redactar_informe" in mermaid
+    assert "redactar_informe --> __end__" in mermaid
 
 
 def test_mermaid_funciona_sin_clave(monkeypatch, capsys):

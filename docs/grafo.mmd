@@ -15,10 +15,12 @@ graph TD;
 	normalizar_ofertas(normalizar_ofertas)
 	clasificar_equivalencia(clasificar_equivalencia)
 	calcular_presupuesto(calcular_presupuesto)
+	redactar_informe(redactar_informe)
 	__end__([<p>__end__</p>]):::last
 	__start__ --> interpretar_pedido;
 	agente_buscador -.-> herramientas;
 	agente_buscador -.-> recolectar_ofertas;
+	calcular_presupuesto --> redactar_informe;
 	clasificar_equivalencia --> calcular_presupuesto;
 	herramientas --> agente_buscador;
 	interpretar_pedido --> validar_pedido;
@@ -29,7 +31,7 @@ graph TD;
 	recolectar_ofertas --> normalizar_ofertas;
 	validar_pedido -.-> pedir_aclaracion;
 	validar_pedido -.-> preparar_busqueda;
-	calcular_presupuesto --> __end__;
+	redactar_informe --> __end__;
 	classDef default fill:#f2f0ff,line-height:1.2
 	classDef first fill-opacity:0
 	classDef last fill:#bfb6fc

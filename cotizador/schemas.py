@@ -194,6 +194,37 @@ class Presupuesto(BaseModel):
     tiendas: list[str] = Field(default_factory=list, description="Tiendas usadas (compra combinada).")
 
 
+# --------------------------- El informe final ---------------------------
+# Estructura del informe, independiente del formato: el mismo objeto se
+# escribe en Markdown o en Word sin que puedan decir cosas distintas.
+
+class Tabla(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    encabezados: list[str]
+    filas: list[list[str]] = Field(default_factory=list)
+
+
+class Seccion(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    titulo: str
+    nivel: int = 2
+    parrafos: list[str] = Field(default_factory=list)
+    vinetas: list[str] = Field(default_factory=list)
+    tablas: list[Tabla] = Field(default_factory=list)
+
+
+class Informe(BaseModel):
+    """El informe como datos, antes de decidir en qué formato se escribe."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    titulo: str
+    fecha: str
+    secciones: list[Seccion] = Field(default_factory=list)
+
+
 class EstadoCompra(BaseModel):
     """Estado que viaja por el grafo.
 
@@ -221,3 +252,4 @@ class EstadoCompra(BaseModel):
     proveedores_consultados: list[str] = Field(default_factory=list)
     presupuestos: list[Presupuesto] = Field(default_factory=list)
     combinado: Optional[Presupuesto] = None
+    informe: Optional[Informe] = None

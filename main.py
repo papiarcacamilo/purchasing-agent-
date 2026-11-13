@@ -15,6 +15,26 @@ from cotizador.errores import explicar_error_openai
 from cotizador.grafo import construir_grafo
 
 
+def guardar_informe(estado, ruta: str) -> str:
+    """Escribe el informe del estado en `ruta`. La extensión elige el formato."""
+    from pathlib import Path
+
+    from cotizador.informe import a_markdown
+
+    if estado.informe is None:
+        return "no se generó informe (el grafo no llegó a redactarlo)"
+
+    destino = Path(ruta)
+    if destino.suffix.lower() == ".docx":
+        from cotizador.informe_word import a_word
+
+        return str(a_word(estado.informe, destino))
+
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(a_markdown(estado.informe), encoding="utf-8")
+    return str(destino)
+
+
 def main() -> int:
     # Git Bash en Windows no siempre usa UTF-8: lo forzamos para ver bien las tildes.
     sys.stdout.reconfigure(encoding="utf-8")
@@ -24,17 +44,24 @@ def main() -> int:
     parser.add_argument(
         "--mermaid", action="store_true", help="Imprime el diagrama Mermaid del grafo y termina."
     )
+    parser.add_argument(
+        "--informe",
+        default="",
+        help="Guarda el informe final. Con .docx escribe Word; con .md, Markdown.",
+    )
     args = parser.parse_args()
 
     if args.mermaid:
         # Piezas de relleno: solo para dibujar, no se llama al LLM ni se exige la clave.
         from langchain_core.runnables import RunnableLambda
 
-        relleno = RunnableLambda(lambda _: None)
+        relleno = RunnableLambda(lambda _: None)  # no se llama: solo se dibuja
         # Se rellenan TODAS las dependencias que usan el modelo. Si el grafo
         # crece con otra, hay que agregarla aquí: la prueba
         # `test_mermaid_funciona_sin_clave` avisa si se olvida.
-        grafo = construir_grafo(interprete=relleno, buscador=relleno, clasificador=relleno)
+        grafo = construir_grafo(
+            interprete=relleno, buscador=relleno, clasificador=relleno, redactor=relleno
+        )
         print(grafo.get_graph().draw_mermaid())
         return 0
 
@@ -110,6 +137,9 @@ def main() -> int:
         print("\n========= SUPUESTOS Y CONDICIONES NO VERIFICADAS =========")
         for suposicion in estado.suposiciones:
             print(f"  - {suposicion}")
+
+    if args.informe:
+        print(f"\nInforme: {guardar_informe(estado, args.informe)}")
 
     print("\n--- Traza de nodos ---")
     for linea in estado.historial:

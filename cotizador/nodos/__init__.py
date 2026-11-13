@@ -8,6 +8,7 @@ from cotizador.nodos.interpretar import crear_nodo_interpretar
 from cotizador.nodos.normalizar import normalizar_ofertas
 from cotizador.nodos.presupuestar import calcular_presupuesto
 from cotizador.nodos.aclarar import pedir_aclaracion
+from cotizador.nodos.informar import crear_nodo_redactar_informe
 from cotizador.nodos.validar import validar_pedido
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "normalizar_ofertas",
     "crear_nodo_clasificar",
     "calcular_presupuesto",
+    "crear_nodo_redactar_informe",
 ]
