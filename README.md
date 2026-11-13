@@ -209,7 +209,7 @@ uv run pytest -q
 ```
 
 **177 pruebas, todas sin red y sin clave**: el LLM se reemplaza por funciones falsas con
-guion, inyectadas en `construir_grafo(...)`. Así se verifica la orquestación quién llama a
-quién, cuándo se corta un ciclo, qué se recolecta sin depender de lo que decida un modelo
+guion, inyectadas en `construir_grafo(...)`. Así se verifica la orquestación: quién llama a
+quién, cuándo se corta un ciclo y qué se recolecta, sin depender de lo que decida un modelo
 real. Hay pruebas que comprueban lo contrario de lo esperado es decir un modelo que desobedece una
 instrucción del prompt, y otro que inventa un precio en la recomendación.
