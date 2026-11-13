@@ -104,4 +104,5 @@ def test_el_diagrama_del_grafo_empieza_por_la_interpretacion():
     mermaid = _construir(_interprete_falso([])).get_graph().draw_mermaid()
     assert "__start__ --> interpretar_pedido" in mermaid
     assert "interpretar_pedido --> preparar_busqueda" in mermaid
-    assert "recolectar_ofertas --> __end__" in mermaid
+    assert "recolectar_ofertas --> normalizar_ofertas" in mermaid
+    assert "normalizar_ofertas --> __end__" in mermaid

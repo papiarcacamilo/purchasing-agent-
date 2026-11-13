@@ -93,6 +93,24 @@ class Oferta(BaseModel):
     nota: Optional[str] = Field(default=None, description="Condición comercial, por ejemplo una oferta.")
 
 
+class OfertaNormalizada(BaseModel):
+    """Una oferta con su contenido llevado a la unidad base y su precio unitario.
+
+    `comparable` dice si se puede comparar con el ítem pedido. Cuando es falso,
+    `motivo` explica por qué (y así se puede informar al usuario, como pide el
+    enunciado, en lugar de descartarla en silencio).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    oferta: Oferta
+    comparable: bool
+    motivo: Optional[str] = None
+    contenido_base: Optional[float] = Field(default=None, description="Contenido en kg, L o unidad.")
+    unidad_base: Optional[Unidad] = None
+    precio_unitario: Optional[float] = Field(default=None, description="Precio por kg, L o unidad.")
+
+
 class ResultadoBusqueda(BaseModel):
     """Las ofertas encontradas para UN ítem del pedido, en todos los proveedores."""
 
@@ -100,6 +118,7 @@ class ResultadoBusqueda(BaseModel):
 
     item: ItemPedido
     ofertas: list[Oferta] = Field(default_factory=list)
+    normalizadas: list[OfertaNormalizada] = Field(default_factory=list)
 
 
 class EstadoCompra(BaseModel):

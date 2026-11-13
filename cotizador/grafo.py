@@ -4,7 +4,7 @@ Flujo actual (fases 1 y 2):
 
     START -> interpretar_pedido -> preparar_busqueda -> agente_buscador
              agente_buscador <-> herramientas        (ciclo del agente)
-             agente_buscador  -> recolectar_ofertas -> END
+             agente_buscador  -> recolectar_ofertas -> normalizar_ofertas -> END
 
 En las siguientes fases se agregan la validación con `interrupt()`, la
 normalización, el presupuesto y el informe.
@@ -22,6 +22,7 @@ from cotizador.nodos import (
     crear_nodo_interpretar,
     crear_nodo_preparar_busqueda,
     crear_nodo_recolectar,
+    normalizar_ofertas,
 )
 from cotizador.routers import enrutar_busqueda
 from cotizador.schemas import EstadoCompra, Oferta
@@ -61,6 +62,7 @@ def construir_grafo(
     # campo se llama "mensajes", no "messages".
     g.add_node("herramientas", ToolNode(herramientas, messages_key="mensajes"))
     g.add_node("recolectar_ofertas", crear_nodo_recolectar(catalogos))
+    g.add_node("normalizar_ofertas", normalizar_ofertas)
 
     # --- Aristas ---
     g.add_edge(START, "interpretar_pedido")
@@ -72,6 +74,7 @@ def construir_grafo(
         "agente_buscador", enrutar_busqueda, ["herramientas", "recolectar_ofertas"]
     )
     g.add_edge("herramientas", "agente_buscador")
-    g.add_edge("recolectar_ofertas", END)
+    g.add_edge("recolectar_ofertas", "normalizar_ofertas")
+    g.add_edge("normalizar_ofertas", END)
 
     return g.compile()

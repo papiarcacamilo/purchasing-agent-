@@ -56,9 +56,16 @@ def main() -> int:
     print(f"Proveedores consultados: {', '.join(estado.proveedores_consultados) or 'ninguno'}")
     for resultado in estado.resultados:
         print(f"\n--- {resultado.item.producto} ({len(resultado.ofertas)} ofertas) ---")
-        for oferta in resultado.ofertas:
+        for normalizada in resultado.normalizadas:
+            oferta = normalizada.oferta
             precio = f"$ {oferta.precio:,.0f}".replace(",", ".")
-            print(f"  [{oferta.proveedor}] {oferta.nombre} | {precio} | {oferta.url}")
+            if normalizada.comparable:
+                unitario = f"$ {normalizada.precio_unitario:,.0f}".replace(",", ".")
+                detalle = f"{unitario} por {normalizada.unidad_base}"
+            else:
+                detalle = f"no comparable: {normalizada.motivo}"
+            print(f"  [{oferta.proveedor}] {oferta.nombre} | {precio} | {detalle}")
+            print(f"      {oferta.url}")
         if not resultado.ofertas:
             print("  Sin cotización en los proveedores consultados.")
     print("\n--- Traza de nodos ---")
