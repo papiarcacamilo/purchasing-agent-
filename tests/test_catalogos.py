@@ -92,6 +92,13 @@ def test_agrupa_por_proveedor_e_ignora_filas_en_blanco(tmp_path):
     assert {p: len(o) for p, o in catalogos.items()} == {"Tienda A": 1, "Tienda B": 1}
 
 
+def test_hay_variedades_que_permiten_distinguir_equivalente_de_sustituto():
+    """El catálogo debe traer alguna variedad (integral, basmati) y no solo arroz blanco."""
+    catalogos = cargar_catalogos(DIRECTORIO_CATALOGOS)
+    nombres = " ".join(o.nombre.lower() for ofertas in catalogos.values() for o in ofertas)
+    assert "integral" in nombres
+
+
 def test_los_catalogos_del_proyecto_son_validos():
     # Vacíos o llenos, los CSV reales nunca deben tener filas inválidas.
     assert isinstance(cargar_catalogos(DIRECTORIO_CATALOGOS), dict)

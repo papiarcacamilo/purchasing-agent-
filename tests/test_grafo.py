@@ -6,7 +6,7 @@ from langchain_core.runnables import RunnableLambda
 
 from cotizador.grafo import construir_grafo
 from cotizador.nodos import crear_nodo_interpretar
-from cotizador.schemas import EstadoCompra, ItemPedido, Oferta, Pedido
+from cotizador.schemas import ClasificacionLote, EstadoCompra, ItemPedido, Oferta, Pedido
 
 # Catálogo mínimo: estas pruebas miran el nodo de interpretación, no la búsqueda.
 CATALOGO = {
@@ -21,9 +21,14 @@ CATALOGO = {
 SIN_BUSQUEDA = RunnableLambda(lambda _: AIMessage(content="no busco nada"))
 
 
+SIN_CLASIFICAR = RunnableLambda(lambda _: ClasificacionLote(clasificaciones=[]))
+
+
 def _construir(interprete):
     """Arma el grafo con el intérprete indicado y el resto de piezas falsas."""
-    return construir_grafo(interprete=interprete, buscador=SIN_BUSQUEDA, catalogos=CATALOGO)
+    return construir_grafo(
+        interprete=interprete, buscador=SIN_BUSQUEDA, clasificador=SIN_CLASIFICAR, catalogos=CATALOGO
+    )
 
 PEDIDO_FALSO = Pedido(
     items=[
@@ -105,4 +110,5 @@ def test_el_diagrama_del_grafo_empieza_por_la_interpretacion():
     assert "__start__ --> interpretar_pedido" in mermaid
     assert "interpretar_pedido --> preparar_busqueda" in mermaid
     assert "recolectar_ofertas --> normalizar_ofertas" in mermaid
-    assert "normalizar_ofertas --> __end__" in mermaid
+    assert "normalizar_ofertas --> clasificar_equivalencia" in mermaid
+    assert "clasificar_equivalencia --> __end__" in mermaid

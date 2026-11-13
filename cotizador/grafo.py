@@ -4,7 +4,8 @@ Flujo actual (fases 1 y 2):
 
     START -> interpretar_pedido -> preparar_busqueda -> agente_buscador
              agente_buscador <-> herramientas        (ciclo del agente)
-             agente_buscador  -> recolectar_ofertas -> normalizar_ofertas -> END
+             agente_buscador  -> recolectar_ofertas -> normalizar_ofertas
+                              -> clasificar_equivalencia -> END
 
 En las siguientes fases se agregan la validación con `interrupt()`, la
 normalización, el presupuesto y el informe.
@@ -19,6 +20,7 @@ from langgraph.prebuilt import ToolNode
 from cotizador.herramientas import crear_herramientas
 from cotizador.nodos import (
     crear_nodo_agente_buscador,
+    crear_nodo_clasificar,
     crear_nodo_interpretar,
     crear_nodo_preparar_busqueda,
     crear_nodo_recolectar,
@@ -31,6 +33,7 @@ from cotizador.schemas import EstadoCompra, Oferta
 def construir_grafo(
     interprete: Optional[Runnable] = None,
     buscador: Optional[Runnable] = None,
+    clasificador: Optional[Runnable] = None,
     catalogos: Optional[dict[str, list[Oferta]]] = None,
     herramientas: Optional[list[BaseTool]] = None,
 ):
@@ -45,12 +48,13 @@ def construir_grafo(
         catalogos = cargar_catalogos()
     if herramientas is None:
         herramientas = crear_herramientas(catalogos)
-    if interprete is None or buscador is None:
+    if interprete is None or buscador is None or clasificador is None:
         # Se importa aquí para no exigir la clave cuando todo se inyecta.
-        from cotizador.llm import construir_buscador, construir_interprete
+        from cotizador.llm import construir_buscador, construir_clasificador, construir_interprete
 
         interprete = interprete or construir_interprete()
         buscador = buscador or construir_buscador(herramientas)
+        clasificador = clasificador or construir_clasificador()
 
     g = StateGraph(EstadoCompra)
 
@@ -63,6 +67,7 @@ def construir_grafo(
     g.add_node("herramientas", ToolNode(herramientas, messages_key="mensajes"))
     g.add_node("recolectar_ofertas", crear_nodo_recolectar(catalogos))
     g.add_node("normalizar_ofertas", normalizar_ofertas)
+    g.add_node("clasificar_equivalencia", crear_nodo_clasificar(clasificador))
 
     # --- Aristas ---
     g.add_edge(START, "interpretar_pedido")
@@ -75,6 +80,7 @@ def construir_grafo(
     )
     g.add_edge("herramientas", "agente_buscador")
     g.add_edge("recolectar_ofertas", "normalizar_ofertas")
-    g.add_edge("normalizar_ofertas", END)
+    g.add_edge("normalizar_ofertas", "clasificar_equivalencia")
+    g.add_edge("clasificar_equivalencia", END)
 
     return g.compile()

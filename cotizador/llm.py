@@ -8,8 +8,8 @@ from langchain_openai import ChatOpenAI
 from langchain_core.tools import BaseTool
 
 from cotizador.config import cargar_config
-from cotizador.prompts import crear_prompt_interprete
-from cotizador.schemas import Pedido
+from cotizador.prompts import PROMPT_CLASIFICADOR, crear_prompt_interprete
+from cotizador.schemas import ClasificacionLote, Pedido
 
 
 def crear_modelo() -> ChatOpenAI:
@@ -44,3 +44,18 @@ def construir_buscador(
     """
     llm = llm or crear_modelo()
     return llm.bind_tools(herramientas)
+
+
+def construir_clasificador(llm: Optional[BaseChatModel] = None) -> Runnable:
+    """Cadena que clasifica un lote de ofertas frente a lo que se pidió.
+
+    Entrada : {"encargo": str} con lo pedido y la lista numerada de ofertas.
+    Salida  : ClasificacionLote (una decisión por oferta, validada por Pydantic).
+    """
+    from langchain_core.prompts import ChatPromptTemplate
+
+    llm = llm or crear_modelo()
+    prompt = ChatPromptTemplate.from_messages(
+        [("system", PROMPT_CLASIFICADOR), ("human", "{encargo}")]
+    )
+    return prompt | llm.with_structured_output(ClasificacionLote, method="json_schema", strict=True)

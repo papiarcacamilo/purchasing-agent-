@@ -53,6 +53,7 @@ def main() -> int:
     print(estado.pedido.model_dump_json(indent=2) if estado.pedido else "Sin pedido.")
 
     print("\n================ OFERTAS ENCONTRADAS ================")
+    print("Leyenda:  = equivalente   ~ sustituto   x no comparable")
     print(f"Proveedores consultados: {', '.join(estado.proveedores_consultados) or 'ninguno'}")
     for resultado in estado.resultados:
         print(f"\n--- {resultado.item.producto} ({len(resultado.ofertas)} ofertas) ---")
@@ -63,8 +64,12 @@ def main() -> int:
                 unitario = f"$ {normalizada.precio_unitario:,.0f}".replace(",", ".")
                 detalle = f"{unitario} por {normalizada.unidad_base}"
             else:
-                detalle = f"no comparable: {normalizada.motivo}"
-            print(f"  [{oferta.proveedor}] {oferta.nombre} | {precio} | {detalle}")
+                detalle = "no comparable"
+            etiqueta = {"equivalente": "=", "sustituto": "~", "no_comparable": "x"}
+            marca = etiqueta.get(normalizada.equivalencia or "", " ")
+            print(f"  {marca} [{oferta.proveedor}] {oferta.nombre} | {precio} | {detalle}")
+            if normalizada.razon:
+                print(f"      {normalizada.equivalencia}: {normalizada.razon}")
             print(f"      {oferta.url}")
         if not resultado.ofertas:
             print("  Sin cotización en los proveedores consultados.")

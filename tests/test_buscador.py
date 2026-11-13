@@ -19,7 +19,7 @@ from cotizador.nodos.buscar import (
     vueltas_usadas,
 )
 from cotizador.routers import enrutar_busqueda
-from cotizador.schemas import EstadoCompra, ItemPedido, Oferta, Pedido
+from cotizador.schemas import ClasificacionLote, EstadoCompra, ItemPedido, Oferta, Pedido
 
 
 def _oferta(proveedor: str, nombre: str, precio: float, **extra) -> Oferta:
@@ -94,6 +94,14 @@ def test_un_proveedor_sin_catalogo_se_reporta_y_no_deja_la_busqueda_vacia():
 
 # --- Nodo del agente ------------------------------------------------------
 
+def test_el_prompt_obliga_a_reintentar_cuando_no_hay_resultados():
+    """Si una tienda no tiene la variedad exacta, debe reintentar con el término general."""
+    from cotizador.prompts import PROMPT_BUSCADOR
+
+    assert "DEBES reintentarla" in PROMPT_BUSCADOR
+    assert '"arroz integral" -> "arroz"' in PROMPT_BUSCADOR
+
+
 def test_el_encargo_inicial_lista_productos_restricciones_y_herramientas():
     modelo, recibido = _modelo_con_guion(AIMessage(content="listo"))
     nodo = crear_nodo_agente_buscador(modelo, HERRAMIENTAS)
@@ -156,7 +164,8 @@ def test_el_tope_de_vueltas_corta_el_ciclo_aunque_el_agente_insista():
 def _grafo(*respuestas: AIMessage):
     modelo, recibido = _modelo_con_guion(*respuestas)
     interprete = RunnableLambda(lambda _: _grafo.pedido)
-    return construir_grafo(interprete=interprete, buscador=modelo,
+    sin_clasificar = RunnableLambda(lambda _: ClasificacionLote(clasificaciones=[]))
+    return construir_grafo(interprete=interprete, buscador=modelo, clasificador=sin_clasificar,
                            catalogos=CATALOGOS, herramientas=HERRAMIENTAS), recibido
 
 

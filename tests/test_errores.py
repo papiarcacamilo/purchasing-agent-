@@ -6,6 +6,7 @@ from langchain_core.runnables import RunnableLambda
 
 import main as cli
 from cotizador.errores import explicar_error_openai
+from cotizador.schemas import ClasificacionLote
 
 PETICION = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
 
@@ -34,8 +35,13 @@ def test_main_muestra_una_linea_clara_y_no_una_traza(monkeypatch, capsys):
     # El buscador también se inyecta: así nada del grafo pide la clave.
     grafo_real = cli.construir_grafo
     sin_busqueda = RunnableLambda(lambda _: AIMessage(content="no busco nada"))
+    sin_clasificar = RunnableLambda(lambda _: ClasificacionLote(clasificaciones=[]))
     monkeypatch.setattr(
-        cli, "construir_grafo", lambda: grafo_real(interprete=RunnableLambda(falla), buscador=sin_busqueda)
+        cli,
+        "construir_grafo",
+        lambda: grafo_real(
+            interprete=RunnableLambda(falla), buscador=sin_busqueda, clasificador=sin_clasificar
+        ),
     )
     monkeypatch.setattr("sys.argv", ["main.py", "--texto", "5 kg de arroz"])
 

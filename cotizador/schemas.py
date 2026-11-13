@@ -22,6 +22,9 @@ from pydantic import BaseModel, ConfigDict, Field
 # Unidades que el sistema sabe convertir. "lb" es la libra de uso comercial.
 Unidad = Literal["kg", "g", "lb", "L", "mL", "unidad"]
 
+# Qué tan bien responde una oferta a lo que pidió el usuario.
+Equivalencia = Literal["equivalente", "sustituto", "no_comparable"]
+
 
 class ItemPedido(BaseModel):
     """Un producto de la lista de compra, tal como lo pidió el usuario."""
@@ -109,6 +112,32 @@ class OfertaNormalizada(BaseModel):
     contenido_base: Optional[float] = Field(default=None, description="Contenido en kg, L o unidad.")
     unidad_base: Optional[Unidad] = None
     precio_unitario: Optional[float] = Field(default=None, description="Precio por kg, L o unidad.")
+    equivalencia: Optional[Equivalencia] = None
+    razon: Optional[str] = Field(default=None, description="Por qué se clasificó así.")
+
+
+class ClasificacionOferta(BaseModel):
+    """Cómo responde UNA oferta a lo que pidió el usuario. Lo decide el LLM."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    numero: int = Field(description="Número de la oferta en la lista recibida, empezando en 1.")
+    equivalencia: Equivalencia = Field(
+        description=(
+            "equivalente: es el producto pedido y cumple todas sus restricciones. "
+            "sustituto: sirve para lo mismo pero cambia una característica. "
+            "no_comparable: no es el producto pedido o incumple una restricción exigida."
+        )
+    )
+    razon: str = Field(description="Una frase breve, en español, que explique la decisión.")
+
+
+class ClasificacionLote(BaseModel):
+    """Salida estructurada del clasificador: una decisión por cada oferta recibida."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    clasificaciones: list[ClasificacionOferta]
 
 
 class ResultadoBusqueda(BaseModel):

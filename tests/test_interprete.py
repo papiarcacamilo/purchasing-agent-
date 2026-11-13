@@ -27,6 +27,12 @@ def test_el_prompt_menciona_todas_las_unidades_del_esquema():
         assert unidad in PROMPT_SISTEMA
 
 
+def test_el_prompt_aclara_que_la_cantidad_no_es_la_presentacion():
+    """Fallo real: "1 litro de aceite" se interpretó como presentación exigida."""
+    assert "La cantidad que quiere comprar NUNCA es la presentación" in PROMPT_SISTEMA
+    assert "1 litro de aceite" in PROMPT_SISTEMA
+
+
 def test_el_prompt_declara_el_texto_como_datos():
     assert "DATOS" in PROMPT_SISTEMA
 
