@@ -14,6 +14,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    # Para ejecutar notebooks/cotizador.ipynb (recorrido del sistema paso a paso).
+    "ipykernel>=6.29",
 ]
 
 [tool.uv]
