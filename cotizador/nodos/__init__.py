@@ -6,6 +6,7 @@ from cotizador.nodos.buscar import (
 from cotizador.nodos.clasificar import crear_nodo_clasificar
 from cotizador.nodos.interpretar import crear_nodo_interpretar
 from cotizador.nodos.normalizar import normalizar_ofertas
+from cotizador.nodos.presupuestar import calcular_presupuesto
 
 __all__ = [
     "crear_nodo_interpretar",
@@ -14,4 +15,5 @@ __all__ = [
     "crear_nodo_recolectar",
     "normalizar_ofertas",
     "crear_nodo_clasificar",
+    "calcular_presupuesto",
 ]

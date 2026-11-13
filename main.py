@@ -73,6 +73,36 @@ def main() -> int:
             print(f"      {oferta.url}")
         if not resultado.ofertas:
             print("  Sin cotización en los proveedores consultados.")
+    def pesos(valor):
+        return "$ " + f"{valor:,.0f}".replace(",", ".")
+
+    def mostrar(presupuesto):
+        print(f"\n--- {presupuesto.nombre} ---")
+        for linea in presupuesto.lineas:
+            if not linea.cubierto:
+                print(f"  {linea.producto}: SIN COTIZACIÓN ({linea.motivo})")
+                continue
+            tienda = f" [{linea.oferta.proveedor}]" if presupuesto.combinado else ""
+            sustituto = "  (sustituto)" if linea.equivalencia == "sustituto" else ""
+            sobra = (
+                f", sobran {linea.sobrante:g} {linea.unidad_base}"
+                if linea.sobrante and linea.sobrante > 0
+                else ""
+            )
+            print(f"  {linea.producto}{tienda}: {linea.paquetes} x {linea.oferta.nombre}")
+            print(f"      {pesos(linea.subtotal)}{sobra}{sustituto}")
+        print(f"  Subtotal productos : {pesos(presupuesto.subtotal_productos)}")
+        print("  Envío              : no verificado")
+        print("  Total confirmado   : no se puede calcular sin el envío")
+        if presupuesto.sin_cotizacion:
+            print(f"  Sin cotización     : {', '.join(presupuesto.sin_cotizacion)}")
+
+    print("\n================ PRESUPUESTO ================")
+    for presupuesto in estado.presupuestos:
+        mostrar(presupuesto)
+    if estado.combinado:
+        mostrar(estado.combinado)
+
     print("\n--- Traza de nodos ---")
     for linea in estado.historial:
         print(linea)

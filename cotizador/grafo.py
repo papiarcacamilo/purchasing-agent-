@@ -5,7 +5,7 @@ Flujo actual (fases 1 y 2):
     START -> interpretar_pedido -> preparar_busqueda -> agente_buscador
              agente_buscador <-> herramientas        (ciclo del agente)
              agente_buscador  -> recolectar_ofertas -> normalizar_ofertas
-                              -> clasificar_equivalencia -> END
+                              -> clasificar_equivalencia -> calcular_presupuesto -> END
 
 En las siguientes fases se agregan la validación con `interrupt()`, la
 normalización, el presupuesto y el informe.
@@ -19,6 +19,7 @@ from langgraph.prebuilt import ToolNode
 
 from cotizador.herramientas import crear_herramientas
 from cotizador.nodos import (
+    calcular_presupuesto,
     crear_nodo_agente_buscador,
     crear_nodo_clasificar,
     crear_nodo_interpretar,
@@ -68,6 +69,7 @@ def construir_grafo(
     g.add_node("recolectar_ofertas", crear_nodo_recolectar(catalogos))
     g.add_node("normalizar_ofertas", normalizar_ofertas)
     g.add_node("clasificar_equivalencia", crear_nodo_clasificar(clasificador))
+    g.add_node("calcular_presupuesto", calcular_presupuesto)
 
     # --- Aristas ---
     g.add_edge(START, "interpretar_pedido")
@@ -81,6 +83,7 @@ def construir_grafo(
     g.add_edge("herramientas", "agente_buscador")
     g.add_edge("recolectar_ofertas", "normalizar_ofertas")
     g.add_edge("normalizar_ofertas", "clasificar_equivalencia")
-    g.add_edge("clasificar_equivalencia", END)
+    g.add_edge("clasificar_equivalencia", "calcular_presupuesto")
+    g.add_edge("calcular_presupuesto", END)
 
     return g.compile()

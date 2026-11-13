@@ -150,6 +150,50 @@ class ResultadoBusqueda(BaseModel):
     normalizadas: list[OfertaNormalizada] = Field(default_factory=list)
 
 
+class LineaPresupuesto(BaseModel):
+    """Lo que hay que comprar de UN ítem en una tienda, y cuánto cuesta."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    producto: str
+    cubierto: bool
+    motivo: Optional[str] = Field(default=None, description="Por qué no se pudo cubrir.")
+    oferta: Optional[Oferta] = None
+    equivalencia: Optional[Equivalencia] = None
+    paquetes: Optional[int] = Field(default=None, description="Empaques enteros a comprar.")
+    cantidad_pedida: Optional[float] = None
+    cantidad_cubierta: Optional[float] = None
+    sobrante: Optional[float] = Field(default=None, description="Lo que sobra por comprar empaques enteros.")
+    unidad_base: Optional[Unidad] = None
+    subtotal: Optional[float] = Field(default=None, description="paquetes x precio del empaque.")
+
+
+class Presupuesto(BaseModel):
+    """Presupuesto de una compra: en una tienda, o combinando varias.
+
+    El envío no se conoce en los catálogos, así que `envio` queda en None y
+    `total_confirmado` también: el enunciado prohíbe tratar un envío desconocido
+    como cero, de modo que el único número cierto es el subtotal de productos.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    nombre: str = Field(description="Nombre de la tienda, o 'Compra combinada'.")
+    combinado: bool = False
+    lineas: list[LineaPresupuesto] = Field(default_factory=list)
+    subtotal_productos: float = 0.0
+    envio: Optional[float] = Field(default=None, description="None significa no verificado.")
+    total_confirmado: Optional[float] = Field(
+        default=None, description="Solo se calcula si el envío está verificado."
+    )
+    items_cubiertos: int = 0
+    items_totales: int = 0
+    completo: bool = False
+    sin_cotizacion: list[str] = Field(default_factory=list)
+    con_sustituto: list[str] = Field(default_factory=list)
+    tiendas: list[str] = Field(default_factory=list, description="Tiendas usadas (compra combinada).")
+
+
 class EstadoCompra(BaseModel):
     """Estado que viaja por el grafo.
 
@@ -169,3 +213,5 @@ class EstadoCompra(BaseModel):
     mensajes: Annotated[list[AnyMessage], add_messages] = Field(default_factory=list)
     resultados: list[ResultadoBusqueda] = Field(default_factory=list)
     proveedores_consultados: list[str] = Field(default_factory=list)
+    presupuestos: list[Presupuesto] = Field(default_factory=list)
+    combinado: Optional[Presupuesto] = None

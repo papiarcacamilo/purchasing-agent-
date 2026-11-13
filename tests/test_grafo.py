@@ -111,4 +111,5 @@ def test_el_diagrama_del_grafo_empieza_por_la_interpretacion():
     assert "interpretar_pedido --> preparar_busqueda" in mermaid
     assert "recolectar_ofertas --> normalizar_ofertas" in mermaid
     assert "normalizar_ofertas --> clasificar_equivalencia" in mermaid
-    assert "clasificar_equivalencia --> __end__" in mermaid
+    assert "clasificar_equivalencia --> calcular_presupuesto" in mermaid
+    assert "calcular_presupuesto --> __end__" in mermaid
