@@ -199,7 +199,7 @@ Entregable 4 final/
 │   ├── herramientas/            # una herramienta de búsqueda por proveedor
 │   └── nodos/                   # un archivo por nodo
 ├── informes/informe.docx        # informe generado por el agente
-└── tests/                       # 177 pruebas, sin red ni clave real
+└── tests/                       # 180 pruebas, sin red ni clave real
 ```
 
 ## Pruebas
@@ -208,7 +208,7 @@ Entregable 4 final/
 uv run pytest -q
 ```
 
-**177 pruebas, todas sin red y sin clave**: el LLM se reemplaza por funciones falsas con
+**180 pruebas, todas sin red y sin clave**: el LLM se reemplaza por funciones falsas con
 guion, inyectadas en `construir_grafo(...)`. Así se verifica la orquestación: quién llama a
 quién, cuándo se corta un ciclo y qué se recolecta, sin depender de lo que decida un modelo
 real. Hay pruebas que comprueban lo contrario de lo esperado es decir un modelo que desobedece una

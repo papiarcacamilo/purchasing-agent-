@@ -6,7 +6,9 @@ Uso:
     uv run python main.py --mermaid            # dibuja el grafo (no usa OpenAI)
 """
 import argparse
+import os
 import sys
+from pathlib import Path
 
 import openai
 
@@ -15,22 +17,39 @@ from agente.errores import explicar_error_openai
 from agente.grafo import construir_grafo
 
 
-def guardar_informe(estado, ruta: str) -> str:
-    """Escribe el informe del estado en `ruta`. La extensión elige el formato."""
-    from pathlib import Path
+# El informe solo se escribe dentro de esta carpeta. Quien ejecuta elige el
+# NOMBRE del archivo, nunca la ruta: así un argumento como "../../algo.md" no
+# puede escribir fuera del proyecto (path traversal).
+CARPETA_INFORMES = Path(__file__).resolve().parent / "informes"
+EXTENSIONES = (".docx", ".md")
 
+
+def ruta_segura(nombre: str) -> Path:
+    """Convierte el nombre pedido en una ruta dentro de `CARPETA_INFORMES`."""
+    base = os.path.realpath(CARPETA_INFORMES)
+    destino = os.path.realpath(os.path.join(base, os.path.basename(nombre)))
+    if os.path.commonpath([base, destino]) != base:
+        raise ValueError(f"El informe debe guardarse dentro de {base}")
+    return Path(destino)
+
+
+def guardar_informe(estado, nombre: str) -> str:
+    """Escribe el informe en `informes/`. La extensión elige el formato."""
     from agente.informe import a_markdown
 
     if estado.informe is None:
         return "no se generó informe (el grafo no llegó a redactarlo)"
 
-    destino = Path(ruta)
+    destino = ruta_segura(nombre)
+    if destino.suffix.lower() not in EXTENSIONES:
+        return f"extensión no admitida; use {' o '.join(EXTENSIONES)}"
+
+    destino.parent.mkdir(parents=True, exist_ok=True)
     if destino.suffix.lower() == ".docx":
         from agente.informe_word import a_word
 
         return str(a_word(estado.informe, destino))
 
-    destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(a_markdown(estado.informe), encoding="utf-8")
     return str(destino)
 
@@ -47,7 +66,7 @@ def main() -> int:
     parser.add_argument(
         "--informe",
         default="",
-        help="Guarda el informe final. Con .docx escribe Word; con .md, Markdown.",
+        help="Nombre del informe; se guarda en informes/. Con .docx es Word; con .md, Markdown.",
     )
     args = parser.parse_args()
 

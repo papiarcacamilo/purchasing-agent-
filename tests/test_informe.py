@@ -1,5 +1,6 @@
 """Pruebas del informe: estructura, Markdown, Word y verificación de cifras."""
 from datetime import date
+from pathlib import Path
 
 from langchain_core.runnables import RunnableLambda
 
@@ -187,3 +188,42 @@ def test_el_word_no_lleva_las_etiquetas_de_la_plantilla(tmp_path):
     assert propiedades.author == "Cotizador de compras"
     assert propiedades.title == "Informe de cotización de compra"
     assert "python-docx" not in (propiedades.comments or "")
+
+
+# --------------------------- dónde se guarda ---------------------------
+
+def _estado_con_informe():
+    estado = _estado()
+    informe = construir_informe(estado, recomendacion="r", fecha=str(HOY))
+    return estado.model_copy(update={"informe": informe})
+
+
+def test_el_informe_no_puede_salir_de_su_carpeta(tmp_path, monkeypatch):
+    """Un nombre como "../../fuera.md" no debe escribir fuera de informes/."""
+    import main
+
+    carpeta = tmp_path / "proyecto" / "informes"
+    monkeypatch.setattr(main, "CARPETA_INFORMES", carpeta)
+
+    ruta = main.guardar_informe(_estado_con_informe(), "../../fuera.md")
+
+    assert Path(ruta).parent == carpeta.resolve()
+    assert not (tmp_path / "fuera.md").exists()
+
+
+def test_la_ruta_del_readme_sigue_funcionando(tmp_path, monkeypatch):
+    import main
+
+    monkeypatch.setattr(main, "CARPETA_INFORMES", tmp_path / "informes")
+    ruta = main.guardar_informe(_estado_con_informe(), "informes/informe.docx")
+    assert Path(ruta) == (tmp_path / "informes" / "informe.docx").resolve()
+    assert Path(ruta).exists()
+
+
+def test_una_extension_no_admitida_no_escribe_nada(tmp_path, monkeypatch):
+    import main
+
+    monkeypatch.setattr(main, "CARPETA_INFORMES", tmp_path / "informes")
+    salida = main.guardar_informe(_estado_con_informe(), "informe.exe")
+    assert "no admitida" in salida
+    assert not (tmp_path / "informes").exists()
